@@ -1,7 +1,7 @@
 /* Caché offline de La Búsqueda del Museo.
    Al publicar cambios en HTML, CSS o JS, sube el número de VERSION
    para que los teléfonos descarten la copia vieja. */
-const VERSION = 'museo-v3';
+const VERSION = 'museo-v4';
 
 const SHELL = [
   './',

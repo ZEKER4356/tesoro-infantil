@@ -1349,6 +1349,42 @@
     if (el.avatar) el.avatar.classList.remove('is-hablando');
   }
 
+  // Frases cortas: algunos navegadores cortan la voz en textos muy largos.
+  function trocearVoz(texto) {
+    const partes = String(texto).match(/[^.!?]+[.!?]*/g) || [String(texto)];
+    const trozos = [];
+    let actual = '';
+
+    function partirLargo(frase) {
+      let resto = frase;
+      while (resto.length > 150) {
+        let corte = resto.lastIndexOf(',', 150);
+        if (corte < 80) corte = resto.lastIndexOf(' ', 150);
+        if (corte < 80) corte = 150;
+        trozos.push(resto.slice(0, corte + 1).trim());
+        resto = resto.slice(corte + 1).trim();
+      }
+      if (resto) trozos.push(resto);
+    }
+
+    partes.forEach((parte) => {
+      const limpia = parte.trim();
+      if (!limpia) return;
+      const candidato = actual ? actual + ' ' + limpia : limpia;
+      if (candidato.length <= 150) {
+        actual = candidato;
+        return;
+      }
+      if (actual) trozos.push(actual);
+      actual = '';
+      if (limpia.length > 150) partirLargo(limpia);
+      else actual = limpia;
+    });
+
+    if (actual) trozos.push(actual);
+    return trozos.length ? trozos : [String(texto)];
+  }
+
   function hablar(texto, opciones) {
     const limpio = String(texto || '').replace(/\s+/g, ' ').trim();
     if (!limpio) return;
@@ -1368,17 +1404,6 @@
         window.speechSynthesis.cancel();
       }
 
-      const frase = new window.SpeechSynthesisUtterance(limpio);
-      if (vozElegida) {
-        frase.voice = vozElegida;
-        frase.lang = vozElegida.lang;
-      } else {
-        frase.lang = 'es-CO';
-      }
-      frase.rate = 0.94;
-      frase.pitch = 1.04;
-      frase.volume = 1;
-
       const terminar = () => {
         if (token !== vozToken) return;
         if (el.avatar) el.avatar.classList.remove('is-hablando');
@@ -1392,21 +1417,38 @@
         }
       };
 
-      let arrancada = false;
-      frase.onstart = () => {
-        arrancada = true;
+      const arrancar = () => {
         if (vozEspera) {
           window.clearTimeout(vozEspera);
           vozEspera = null;
         }
         if (token === vozToken && el.avatar) el.avatar.classList.add('is-hablando');
       };
-      frase.onend = terminar;
-      frase.onerror = terminar;
+
+      const trozos = trocearVoz(limpio);
+      const frases = trozos.map((trozo, indice) => {
+        const frase = new window.SpeechSynthesisUtterance(trozo);
+        if (vozElegida) {
+          frase.voice = vozElegida;
+          frase.lang = vozElegida.lang;
+        } else {
+          frase.lang = 'es-CO';
+        }
+        frase.rate = 0.94;
+        frase.pitch = 1.04;
+        frase.volume = 1;
+        frase.onstart = arrancar;
+
+        if (indice === trozos.length - 1) {
+          frase.onend = terminar;
+          frase.onerror = terminar;
+        }
+        return frase;
+      });
 
       if (el.avatar) el.avatar.classList.add('is-hablando');
       if (vozTemporizador) window.clearTimeout(vozTemporizador);
-      vozTemporizador = window.setTimeout(terminar, Math.min(30000, Math.max(3000, limpio.length * 95)));
+      vozTemporizador = window.setTimeout(terminar, Math.min(60000, Math.max(3000, limpio.length * 110)));
 
       // Si el navegador bloquea la voz automática, la boca deja de moverse.
       vozEspera = window.setTimeout(() => {
@@ -1414,10 +1456,10 @@
           window.clearTimeout(vozEspera);
           vozEspera = null;
         }
-        if (!arrancada && token === vozToken && el.avatar) el.avatar.classList.remove('is-hablando');
+        if (token === vozToken && el.avatar) el.avatar.classList.remove('is-hablando');
       }, 1300);
 
-      window.speechSynthesis.speak(frase);
+      frases.forEach((frase) => window.speechSynthesis.speak(frase));
     } catch (error) {
       if (el.avatar) el.avatar.classList.remove('is-hablando');
     }
