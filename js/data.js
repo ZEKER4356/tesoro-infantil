@@ -16,6 +16,24 @@ window.MUSEO = (function () {
       'y armaste el museo pieza por pieza. Cada rincón que viste guarda una historia, ' +
       'y ahora forma parte de la tuya. Vuelve cuando quieras, explorador.',
 
+    /* El guía habla con la voz del dispositivo (Web Speech API).
+       Estos textos se leen con el botón "Escuchar otra vez". */
+    guia: {
+      nombre: 'San Juan Nepomuceno',
+      bienvenida:
+        '¡Hola, explorador! Soy San Juan Nepomuceno. En este museo hay nueve pergaminos ' +
+        'escondidos. Lanza el dado, busca el escalón y escanea su código. ¡Vamos juntos!',
+      regreso: '¡Hola otra vez! Toca continuar y seguimos la búsqueda.',
+      completo: '¡Qué alegría verte otra vez! Tu museo ya está completo. Puedes verlo en el tablero.',
+      dado: 'Toca el dado para saber a qué escalón ir.',
+      tablero: 'Toca una pieza de tu morral y luego la casilla donde crees que va.',
+      tableroVacio: 'Todavía no tienes piezas. Escanea el código de un escalón para conseguir la primera.',
+      tableroCompleto: 'El museo está completo. ¡Buen trabajo, explorador!',
+      pergaminos: 'Aquí guardas tus pergaminos. Toca uno para volver a escucharlo.',
+      pergaminosVacio: 'Todavía no tienes pergaminos. Escanea el código de un escalón para conseguir el primero.',
+      datoEnPrueba: 'El dato curioso de este escalón todavía está en prueba.'
+    },
+
     prefijoQR: 'MUSEO_ESCALON_',
     etapas: 9,
 

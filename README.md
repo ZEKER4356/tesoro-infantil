@@ -76,6 +76,32 @@ son marcadores visibles, no contenido real del museo. Cuando tengas los nueve da
 
 El título de la aventura y el mensaje final también están en `js/data.js`.
 
+## Voz y guía
+
+San Juan Nepomuceno acompaña la partida con un globo de diálogo y voz. La voz usa la
+Web Speech API del propio dispositivo (`speechSynthesis`), sin servicios externos ni
+archivos de audio. Prefiere una voz en español de Colombia, Latinoamérica o España, en
+ese orden.
+
+- En el inicio da la bienvenida; si hay una partida guardada, recuerda cuántos
+  pergaminos llevas.
+- Narra el resultado del dado, los errores de escaneo, el dato curioso del pergamino y
+  el mensaje de victoria.
+- Cada globo tiene **Escuchar otra vez**. En los modales del pergamino y de la victoria
+  el botón repite el texto correspondiente.
+- Respeta el botón de sonido. Si está silenciado, **Escuchar otra vez** lo activa y
+  vuelve a leer.
+- En el tablero también comenta la pieza elegida, los aciertos y los errores.
+
+Los textos se editan en `js/data.js`, dentro de `guia`. Los datos curiosos se narran
+desde `pergaminos`; mientras `esPlaceholder` sea `true`, la voz avisa que el dato está
+en prueba.
+
+El navegador puede bloquear la bienvenida automática hasta el primer toque en la
+pantalla. Los botones **Escuchar otra vez** siempre funcionan porque nacen de un toque.
+En iPhone, la voz necesita ese primer toque; la calidad y disponibilidad de voces
+dependen del sistema.
+
 ## Imprimir los QRs
 
 Abre `https://tu-sitio/?admin=1`. Escribe la dirección pública del juego en el campo
@@ -109,8 +135,8 @@ manteniendo los tamaños, y `icon.svg`.
 ```
 index.html                vistas, modales y sprite SVG
 css/styles.css            sistema visual, dado, flip 3D, tablero, confeti, impresión
-js/data.js                contenido y rutas de imágenes
-js/app.js                 estado, dado, cámara, tablero, admin
+js/data.js                contenido, textos de la guía y rutas de imágenes
+js/app.js                 estado, dado, cámara, voz, tablero, admin
 manifest.webmanifest      instalación como app
 sw.js                     caché offline
 assets/frente/            piezas del rompecabezas
@@ -121,6 +147,8 @@ assets/icons/             iconos PWA
 ## Límites conocidos
 
 - `navigator.vibrate` no existe en iOS. El juego funciona igual, sin vibración.
+- La voz usa las voces instaladas en el dispositivo. En iOS suele necesitar un primer
+  toque; si no hay ninguna voz en español, el sistema usa la voz por defecto.
 - La cámara requiere HTTPS o `localhost`.
 - El progreso vive en `localStorage` del dispositivo. Dos niños en el mismo teléfono
   comparten partida; usa **Reiniciar partida** al prestarlo.
