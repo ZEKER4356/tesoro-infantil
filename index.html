@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>La Búsqueda del Museo</title>
+  <meta name="description" content="Búsqueda del tesoro en un museo: nueve escalones, nueve pergaminos y un rompecabezas de 3 por 3.">
+  <meta name="theme-color" content="#3E2723">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="El Museo">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <svg class="sprite" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#F8F0DA"/>
+        <stop offset="1" stop-color="#E4D0A6"/>
+      </linearGradient>
+      <linearGradient id="piedra" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#E3CFA8"/>
+        <stop offset="1" stop-color="#C3A374"/>
+      </linearGradient>
+      <linearGradient id="suelo" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#D9C39A"/>
+        <stop offset="1" stop-color="#BFA477"/>
+      </linearGradient>
+    </defs>
+
+    <symbol id="mural" viewBox="0 0 900 900">
+      <rect width="900" height="900" fill="url(#cielo)"/>
+      <circle cx="706" cy="164" r="86" fill="#D4AF37" opacity=".22"/>
+      <circle cx="706" cy="164" r="58" fill="#D4AF37" opacity=".55"/>
+      <ellipse cx="196" cy="208" rx="92" ry="26" fill="#F8F0DA" opacity=".7"/>
+      <ellipse cx="268" cy="222" rx="58" ry="18" fill="#F8F0DA" opacity=".55"/>
+      <path d="M0 520 C120 470 200 520 300 500 C420 476 500 520 620 496 C720 476 820 500 900 486 L900 700 L0 700 Z" fill="#2E7D32" opacity=".14"/>
+      <path d="M0 576 C160 538 240 588 380 564 C520 540 640 584 900 554 L900 720 L0 720 Z" fill="#2E7D32" opacity=".2"/>
+      <rect y="660" width="900" height="240" fill="url(#suelo)"/>
+      <rect x="230" y="400" width="440" height="206" fill="url(#piedra)"/>
+      <path d="M206 380 L450 244 L694 380 Z" fill="url(#piedra)"/>
+      <path d="M254 372 L450 268 L646 372 Z" fill="#D8C096" opacity=".55"/>
+      <circle cx="450" cy="332" r="20" fill="#D4AF37" opacity=".9"/>
+      <circle cx="450" cy="332" r="8" fill="#3E2723" opacity=".55"/>
+      <rect x="216" y="380" width="468" height="22" fill="#B08D57"/>
+      <rect x="251" y="402" width="50" height="14" fill="#C9AE7F"/>
+      <rect x="339" y="402" width="50" height="14" fill="#C9AE7F"/>
+      <rect x="509" y="402" width="50" height="14" fill="#C9AE7F"/>
+      <rect x="597" y="402" width="50" height="14" fill="#C9AE7F"/>
+      <rect x="258" y="416" width="36" height="182" fill="url(#piedra)"/>
+      <rect x="346" y="416" width="36" height="182" fill="url(#piedra)"/>
+      <rect x="516" y="416" width="36" height="182" fill="url(#piedra)"/>
+      <rect x="604" y="416" width="36" height="182" fill="url(#piedra)"/>
+      <rect x="251" y="598" width="50" height="8" fill="#C9AE7F"/>
+      <rect x="339" y="598" width="50" height="8" fill="#C9AE7F"/>
+      <rect x="509" y="598" width="50" height="8" fill="#C9AE7F"/>
+      <rect x="597" y="598" width="50" height="8" fill="#C9AE7F"/>
+      <rect x="300" y="450" width="40" height="64" fill="#8D6E63" opacity=".5"/>
+      <rect x="560" y="450" width="40" height="64" fill="#8D6E63" opacity=".5"/>
+      <path d="M410 606 V526 a40 40 0 0 1 80 0 V606 Z" fill="#4E342E"/>
+      <path d="M404 606 V524 a46 46 0 0 1 92 0 V606" fill="none" stroke="#D4AF37" stroke-width="5" opacity=".65"/>
+      <rect x="210" y="606" width="480" height="18" fill="#C9AE7F"/>
+      <rect x="190" y="624" width="520" height="18" fill="#BFA070"/>
+      <rect x="170" y="642" width="560" height="18" fill="#B08D57"/>
+      <polygon points="412,660 488,660 566,900 334,900" fill="#E6D3AD" opacity=".85"/>
+      <rect x="116" y="736" width="10" height="44" fill="#5D4037"/>
+      <circle cx="120" cy="700" r="52" fill="#2E7D32" opacity=".82"/>
+      <circle cx="104" cy="686" r="30" fill="#388E3C" opacity=".6"/>
+      <rect x="795" y="754" width="11" height="46" fill="#5D4037"/>
+      <circle cx="800" cy="712" r="60" fill="#2E7D32" opacity=".82"/>
+      <circle cx="782" cy="694" r="34" fill="#388E3C" opacity=".6"/>
+      <circle cx="62" cy="752" r="30" fill="#2E7D32" opacity=".75"/>
+      <circle cx="856" cy="764" r="26" fill="#2E7D32" opacity=".75"/>
+      <circle cx="268" cy="784" r="7" fill="#D4AF37" opacity=".85"/>
+      <circle cx="300" cy="820" r="6" fill="#D4AF37" opacity=".7"/>
+      <circle cx="640" cy="800" r="7" fill="#D4AF37" opacity=".85"/>
+      <circle cx="606" cy="842" r="6" fill="#D4AF37" opacity=".7"/>
+    </symbol>
+
+    <symbol id="i-compass" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M15.2 8.8l-2.2 4.4-4.4 2.2 2.2-4.4z"/>
+      <circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/>
+    </symbol>
+    <symbol id="i-dado" viewBox="0 0 24 24">
+      <rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+      <g fill="currentColor" stroke="none">
+        <circle cx="8" cy="8" r="1.35"/><circle cx="12" cy="8" r="1.35"/><circle cx="16" cy="8" r="1.35"/>
+        <circle cx="8" cy="12" r="1.35"/><circle cx="12" cy="12" r="1.35"/><circle cx="16" cy="12" r="1.35"/>
+        <circle cx="8" cy="16" r="1.35"/><circle cx="12" cy="16" r="1.35"/><circle cx="16" cy="16" r="1.35"/>
+      </g>
+    </symbol>
+    <symbol id="i-scroll" viewBox="0 0 24 24">
+      <path d="M6 6c2 1.6 4-1.6 6 0s4-1.6 6 0v12c-2-1.6-4 1.6-6 0s-4 1.6-6 0z"/>
+      <path d="M9 10h6M9 14h6"/>
+    </symbol>
+    <symbol id="i-puzzle" viewBox="0 0 24 24">
+      <path d="M9.2 4.4a2.1 2.1 0 0 1 4.2 0V6h2.9a1.1 1.1 0 0 1 1.1 1.1v2.9h1.2a2.1 2.1 0 0 1 0 4.2h-1.2v2.9a1.1 1.1 0 0 1-1.1 1.1h-2.9v-1.2a2.1 2.1 0 0 0-4.2 0V18H6.3a1.1 1.1 0 0 1-1.1-1.1v-2.9h1.2a2.1 2.1 0 0 0 0-4.2H5.2V6.9A1.1 1.1 0 0 1 6.3 5.8h2.9z"/>
+    </symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24">
+      <path d="M4 8.6A1.6 1.6 0 0 1 5.6 7h1.9l1.3-2h6.4l1.3 2h1.9A1.6 1.6 0 0 1 20 8.6v8.8a1.6 1.6 0 0 1-1.6 1.6H5.6A1.6 1.6 0 0 1 4 17.4z"/>
+      <circle cx="12" cy="12.8" r="3.3"/>
+    </symbol>
+    <symbol id="i-qr" viewBox="0 0 24 24">
+      <rect x="4" y="4" width="6" height="6" rx="1.2"/>
+      <rect x="14" y="4" width="6" height="6" rx="1.2"/>
+      <rect x="4" y="14" width="6" height="6" rx="1.2"/>
+      <path d="M14 14h2.4v2.4H14zM18.4 18.4H21V21h-2.6zM14 19.6h2.4V21H14z"/>
+    </symbol>
+    <symbol id="i-museum" viewBox="0 0 24 24">
+      <path d="M3 9.2l9-5 9 5"/>
+      <path d="M3 9.2h18M4.5 20.5h15"/>
+      <path d="M6.4 9.2v11.3M10.2 9.2v11.3M13.8 9.2v11.3M17.6 9.2v11.3"/>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path d="M4.5 12.4l4.9 5 10.1-10.9"/>
+    </symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24">
+      <rect x="5" y="10.4" width="14" height="9.8" rx="2.4"/>
+      <path d="M8.4 10.4V8a3.6 3.6 0 0 1 7.2 0v2.4"/>
+    </symbol>
+    <symbol id="i-atras" viewBox="0 0 24 24">
+      <path d="M14.5 5.5L8 12l6.5 6.5"/>
+    </symbol>
+    <symbol id="i-mapa" viewBox="0 0 24 24">
+      <path d="M9 4.2L3.5 6.6v13L9 17.2l6 2.6 5.5-2.4v-13L15 6.8z"/>
+      <path d="M9 4.2v13M15 6.8v13"/>
+    </symbol>
+    <symbol id="i-sonido" viewBox="0 0 24 24">
+      <path d="M4 9.8v4.4h3.2l4.3 3.6V6.2L7.2 9.8z"/>
+      <path d="M15.4 9.4a3.6 3.6 0 0 1 0 5.2M17.9 6.9a7.2 7.2 0 0 1 0 10.2"/>
+    </symbol>
+    <symbol id="i-silencio" viewBox="0 0 24 24">
+      <path d="M4 9.8v4.4h3.2l4.3 3.6V6.2L7.2 9.8z"/>
+      <path d="M16 9.6l5 4.8M21 9.6l-5 4.8"/>
+    </symbol>
+    <symbol id="i-imprimir" viewBox="0 0 24 24">
+      <path d="M7 9V3.8h10V9"/>
+      <rect x="4" y="9" width="16" height="7.2" rx="2"/>
+      <path d="M7 13.6h10v6.6H7z"/>
+    </symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24">
+      <path d="M20 12a8 8 0 1 1-2.6-5.9"/>
+      <path d="M20 4.2v4.6h-4.6"/>
+    </symbol>
+    <symbol id="i-cerrar" viewBox="0 0 24 24">
+      <path d="M6 6l12 12M18 6L6 18"/>
+    </symbol>
+  </svg>
+
+  <main class="app">
+    <!-- INICIO -->
+    <section class="vista vista--inicio" id="vista-inicio" data-vista="inicio" aria-labelledby="titulo-inicio">
+      <header class="inicio__marca">
+        <svg class="icono" aria-hidden="true"><use href="#i-compass"/></svg>
+        <span>Museo</span>
+        <button class="btn-icono btn-icono--sonido" type="button" data-accion="sonido" aria-label="Silenciar los sonidos" aria-pressed="true">
+          <svg class="icono" aria-hidden="true"><use href="#i-sonido"/></svg>
+        </button>
+      </header>
+
+      <h1 class="inicio__titulo" id="titulo-inicio"><span>La Búsqueda</span> <span>del Museo</span></h1>
+      <p class="inicio__entrada">Nueve escalones. Nueve pergaminos. Un museo esperando a que lo descubras.</p>
+
+      <div class="mapa-ruta" aria-hidden="true">
+        <svg viewBox="0 0 320 170" role="presentation">
+          <path d="M34 128 L68 116 L102 128 L136 110 L170 124 L204 104 L238 118 L270 96 L296 74"
+                fill="none" stroke="#D4AF37" stroke-width="2.5" stroke-dasharray="2 7" stroke-linecap="round"/>
+          <g font-family="Fredoka, sans-serif" font-size="11" text-anchor="middle">
+            <circle cx="34" cy="128" r="10" fill="#3E2723" stroke="#D4AF37" stroke-width="2"/><text x="34" y="132" fill="#F4EBD0">1</text>
+            <circle cx="68" cy="116" r="10" fill="#3E2723" stroke="#D4AF37" stroke-width="2"/><text x="68" y="120" fill="#F4EBD0">2</text>
+            <circle cx="102" cy="128" r="10" fill="#3E2723" stroke="#D4AF37" stroke-width="2"/><text x="102" y="132" fill="#F4EBD0">3</text>
+            <circle cx="136" cy="110" r="10" fill="#3E2723" stroke="#D4AF37" stroke-width="2"/><text x="136" y="114" fill="#F4EBD0">4</text>
+            <circle cx="170" cy="124" r="10" fill="#3E2723" stroke="#D4AF37" stroke-width="2"/><text x="170" y="128" fill="#F4EBD0">5</text>
+            <circle cx="204" cy="104" r="10" fill="#3E2723" stroke="#D4AF37" stroke-width="2"/><text x="204" y="108" fill="#F4EBD0">6</text>
+            <circle cx="238" cy="118" r="10" fill="#3E2723" stroke="#D4AF37" stroke-width="2"/><text x="238" y="122" fill="#F4EBD0">7</text>
+            <circle cx="270" cy="96" r="10" fill="#3E2723" stroke="#D4AF37" stroke-width="2"/><text x="270" y="100" fill="#F4EBD0">8</text>
+            <circle cx="296" cy="74" r="10" fill="#D4AF37" stroke="#3E2723" stroke-width="2"/><text x="296" y="78" fill="#3E2723">9</text>
+          </g>
+          <g transform="translate(288 22)">
+            <path d="M0 12 L14 4 L28 12" fill="none" stroke="#3E2723" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M3 12 h22 M5 12 v14 M10.5 12 v14 M17.5 12 v14 M23 12 v14 M2 26 h24"
+                  fill="none" stroke="#3E2723" stroke-width="2.4" stroke-linecap="round"/>
+          </g>
+        </svg>
+        <p class="mapa-ruta__pie">Tu recorrido empieza aquí y termina en el museo.</p>
+      </div>
+
+      <ol class="pasos">
+        <li class="paso">
+          <span class="paso__num">1</span>
+          <svg class="icono paso__icono" aria-hidden="true"><use href="#i-dado"/></svg>
+          <p>Lanza el dado de nueve caras. Te dirá a qué escalón ir.</p>
+        </li>
+        <li class="paso">
+          <span class="paso__num">2</span>
+          <svg class="icono paso__icono" aria-hidden="true"><use href="#i-qr"/></svg>
+          <p>Busca ese escalón y escanea el QR que está pegado.</p>
+        </li>
+        <li class="paso">
+          <span class="paso__num">3</span>
+          <svg class="icono paso__icono" aria-hidden="true"><use href="#i-puzzle"/></svg>
+          <p>Guarda el pergamino y coloca su pieza en el rompecabezas.</p>
+        </li>
+      </ol>
+
+      <div class="inicio__acciones">
+        <button class="btn btn--primario btn--grande" type="button" id="btn-continuar" hidden>
+          <span id="continuar-etiqueta">Continuar la búsqueda</span>
+          <span class="btn__detalle" id="continuar-detalle"></span>
+        </button>
+        <button class="btn btn--primario btn--grande" type="button" id="btn-iniciar">Iniciar la búsqueda</button>
+      </div>
+
+      <footer class="inicio__pie">
+        <button class="btn-fantasma" type="button" id="btn-reiniciar">Reiniciar partida</button>
+      </footer>
+    </section>
+
+    <!-- JUEGO -->
+    <section class="vista" id="vista-juego" data-vista="juego" aria-labelledby="titulo-juego" hidden>
+      <header class="barra">
+        <button class="btn-icono" type="button" data-ir="inicio" aria-label="Volver al inicio">
+          <svg class="icono" aria-hidden="true"><use href="#i-mapa"/></svg>
+        </button>
+        <h2 class="barra__titulo" id="titulo-juego">La búsqueda</h2>
+        <button class="btn-icono btn-icono--sonido" type="button" data-accion="sonido" aria-label="Silenciar los sonidos" aria-pressed="true">
+          <svg class="icono" aria-hidden="true"><use href="#i-sonido"/></svg>
+        </button>
+      </header>
+
+      <ol class="progreso" id="lista-progreso" aria-label="Escalones encontrados"></ol>
+
+      <div class="panel panel--dado">
+        <p class="panel__titulo">Dado de nueve caras</p>
+        <div class="dado" id="dado">
+          <span class="dado__aguja" id="dado-aguja" aria-hidden="true"></span>
+          <div class="dado__paradas" id="dado-paradas" aria-hidden="true"></div>
+          <div class="dado__brujula">
+            <span class="dado__num" id="dado-numero">?</span>
+          </div>
+        </div>
+        <p class="dado__estado" id="dado-estado" aria-live="polite">Lanza el dado para saber a qué escalón ir.</p>
+        <button class="btn btn--primario btn--grande" type="button" id="btn-lanzar">Lanzar el dado</button>
+      </div>
+
+      <div class="panel panel--objetivo" id="panel-objetivo" hidden>
+        <p class="objetivo__etiqueta">Tu dado marca</p>
+        <p class="objetivo__numero">Escalón <strong id="objetivo-numero">1</strong></p>
+        <button class="btn btn--primario btn--grande" type="button" id="btn-escanear">Escanear el QR del escalón</button>
+        <button class="btn btn--secundario" type="button" id="btn-simular" data-debug hidden>Simular escaneo (modo prueba)</button>
+      </div>
+
+      <div class="aviso" id="aviso-pendiente" hidden>
+        <p class="aviso__texto">Tienes un pergamino sin guardar.</p>
+        <button class="btn btn--secundario" type="button" id="btn-abrir-pendiente">Abrir el pergamino</button>
+      </div>
+
+      <div class="aviso aviso--exito" id="aviso-armar" hidden>
+        <p class="aviso__texto">Reuniste los nueve pergaminos. Falta armar el rompecabezas.</p>
+        <button class="btn btn--secundario" type="button" id="btn-ir-tablero">Ir al tablero</button>
+      </div>
+    </section>
+
+    <!-- TABLERO -->
+    <section class="vista" id="vista-tablero" data-vista="tablero" aria-labelledby="titulo-tablero" hidden>
+      <header class="barra">
+        <button class="btn-icono" type="button" data-ir="juego" aria-label="Volver al dado">
+          <svg class="icono" aria-hidden="true"><use href="#i-atras"/></svg>
+        </button>
+        <h2 class="barra__titulo" id="titulo-tablero">El rompecabezas</h2>
+        <button class="btn-icono btn-icono--sonido" type="button" data-accion="sonido" aria-label="Silenciar los sonidos" aria-pressed="true">
+          <svg class="icono" aria-hidden="true"><use href="#i-sonido"/></svg>
+        </button>
+      </header>
+
+      <p class="pista">Toca una pieza de tu morral y luego la casilla donde va. Si aciertas, se queda brillando.</p>
+      <p class="tablero__cuenta" id="tablero-cuenta" aria-live="polite">0 de 9 piezas en su sitio</p>
+
+      <div class="tablero" id="tablero" role="group" aria-label="Tablero de rompecabezas de tres por tres"></div>
+
+      <div class="inventario">
+        <h3 class="inventario__titulo">Piezas en tu morral</h3>
+        <div class="inventario__lista" id="inventario"></div>
+        <p class="vacio" id="inventario-vacio">Todavía no tienes piezas. Escanea el QR de un escalón para conseguir la primera.</p>
+      </div>
+
+      <button class="btn btn--primario" type="button" id="btn-victoria-final" hidden>Ver el mensaje final</button>
+    </section>
+
+    <!-- PERGAMINOS -->
+    <section class="vista" id="vista-pergaminos" data-vista="pergaminos" aria-labelledby="titulo-pergaminos" hidden>
+      <header class="barra">
+        <button class="btn-icono" type="button" data-ir="juego" aria-label="Volver al dado">
+          <svg class="icono" aria-hidden="true"><use href="#i-atras"/></svg>
+        </button>
+        <h2 class="barra__titulo" id="titulo-pergaminos">Mis pergaminos</h2>
+        <button class="btn-icono btn-icono--sonido" type="button" data-accion="sonido" aria-label="Silenciar los sonidos" aria-pressed="true">
+          <svg class="icono" aria-hidden="true"><use href="#i-sonido"/></svg>
+        </button>
+      </header>
+
+      <p class="coleccion__cuenta" id="coleccion-cuenta" aria-live="polite">0 de 9 pergaminos reunidos</p>
+      <div class="coleccion" id="coleccion"></div>
+      <p class="vacio" id="coleccion-vacio">Tu colección está vacía. Cada escalón guarda un pergamino.</p>
+    </section>
+
+    <!-- ADMIN -->
+    <section class="vista vista--admin" id="vista-admin" data-vista="admin" aria-labelledby="titulo-admin" hidden>
+      <header class="admin__barra">
+        <div>
+          <p class="admin__marca">Modo administrador</p>
+          <h2 class="admin__titulo" id="titulo-admin">QRS para imprimir</h2>
+        </div>
+        <button class="btn btn--secundario" type="button" data-ir="inicio">Ir al juego</button>
+      </header>
+
+      <div class="admin__controles">
+        <label class="admin__label" for="admin-url">Dirección del QR maestro</label>
+        <input class="admin__input" id="admin-url" type="url" inputmode="url" spellcheck="false" autocomplete="off">
+        <p class="ayuda">Escribe la dirección pública del juego. Ese QR abrirá la pantalla de inicio.</p>
+        <div class="admin__botones">
+          <button class="btn btn--primario" type="button" id="btn-generar">
+            <svg class="icono" aria-hidden="true"><use href="#i-refresh"/></svg>
+            Generar los QRs
+          </button>
+          <button class="btn btn--secundario" type="button" id="btn-imprimir">
+            <svg class="icono" aria-hidden="true"><use href="#i-imprimir"/></svg>
+            Imprimir
+          </button>
+        </div>
+        <p class="admin__estado" id="admin-estado" role="status"></p>
+      </div>
+
+      <div class="admin__hoja" id="admin-hoja">
+        <div class="hoja__cabecera">
+          <h3>La Búsqueda del Museo</h3>
+          <p>Recorta por las líneas. Pega el QR de la entrada en el acceso y un QR en cada escalón, con el número a la vista.</p>
+        </div>
+
+        <article class="qr-tarjeta qr-tarjeta--maestro">
+          <p class="qr-tarjeta__etiqueta">Entrada del museo</p>
+          <div class="qr-tarjeta__codigo" id="qr-maestro"></div>
+          <p class="qr-tarjeta__texto">Escanea aquí para empezar</p>
+          <p class="qr-tarjeta__url" id="qr-maestro-url"></p>
+        </article>
+
+        <div class="qr-grid" id="qr-grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="nav-inferior" id="nav-inferior" aria-label="Secciones del juego" hidden>
+    <button class="nav-btn" type="button" data-ir="juego">
+      <svg class="icono" aria-hidden="true"><use href="#i-dado"/></svg>
+      <span>Dado</span>
+    </button>
+    <button class="nav-btn" type="button" data-ir="tablero">
+      <svg class="icono" aria-hidden="true"><use href="#i-puzzle"/></svg>
+      <span>Tablero</span>
+    </button>
+    <button class="nav-btn" type="button" data-ir="pergaminos">
+      <svg class="icono" aria-hidden="true"><use href="#i-scroll"/></svg>
+      <span>Pergaminos</span>
+    </button>
+  </nav>
+
+  <!-- ESCANER -->
+  <div class="modal" id="modal-escaner" hidden>
+    <div class="modal__fondo" data-cerrar="escaner"></div>
+    <div class="modal__caja" role="dialog" aria-modal="true" aria-labelledby="escaner-titulo">
+      <header class="modal__cabecera">
+        <h2 id="escaner-titulo">Escanea el QR</h2>
+        <button class="btn-icono" type="button" data-cerrar="escaner" aria-label="Cerrar el escáner">
+          <svg class="icono" aria-hidden="true"><use href="#i-cerrar"/></svg>
+        </button>
+      </header>
+      <p class="modal__texto" id="escaner-instruccion">Apunta la cámara al QR del escalón.</p>
+      <div class="escaner__marco">
+        <div class="escaner__lector" id="qr-lector"></div>
+        <div class="escaner__guia" aria-hidden="true"><span class="escaner__linea"></span></div>
+        <p class="escaner__cargando" id="escaner-cargando">Preparando la cámara...</p>
+      </div>
+      <p class="mensaje-error" id="escaner-error" role="alert" hidden></p>
+      <button class="btn btn--secundario" type="button" id="btn-reintentar" hidden>Volver a escanear</button>
+      <button class="btn btn--secundario" type="button" id="btn-simular-modal" data-debug hidden>Simular escaneo correcto</button>
+      <p class="ayuda">Si la cámara no abre, revisa el permiso de cámara del navegador.</p>
+    </div>
+  </div>
+
+  <!-- PERGAMINO -->
+  <div class="modal" id="modal-pergamino" hidden>
+    <div class="modal__fondo" data-cerrar="pergamino"></div>
+    <div class="modal__caja" role="dialog" aria-modal="true" aria-labelledby="pergamino-titulo">
+      <header class="modal__cabecera">
+        <h2 id="pergamino-titulo">Pergamino del escalón</h2>
+        <button class="btn-icono" type="button" data-cerrar="pergamino" aria-label="Cerrar el pergamino">
+          <svg class="icono" aria-hidden="true"><use href="#i-cerrar"/></svg>
+        </button>
+      </header>
+
+      <div class="flip" id="pergamino-flip" role="button" tabindex="0" aria-pressed="false" aria-label="Girar el pergamino">
+        <div class="flip__cara">
+          <div class="flip__lado flip__lado--frente">
+            <div class="pergamino__frente" id="pergamino-visual"></div>
+            <p class="flip__pista">Toca la tarjeta para girarla</p>
+          </div>
+          <div class="flip__lado flip__lado--atras">
+            <div class="pergamino">
+              <span class="pergamino__borde" aria-hidden="true"></span>
+              <p class="pergamino__titulo" id="pergamino-subtitulo">Pergamino del escalón 1</p>
+              <p class="pergamino__sabias">¿Sabías que...?</p>
+              <p class="pergamino__dato" id="pergamino-dato"></p>
+              <p class="pergamino__prueba" id="pergamino-prueba" hidden></p>
+              <span class="sello" aria-hidden="true">
+                <svg class="icono" aria-hidden="true"><use href="#i-compass"/></svg>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn--secundario" type="button" id="btn-girar">Ver la espalda</button>
+      <button class="btn btn--primario btn--grande" type="button" id="btn-guardar">Guardar en mi inventario</button>
+      <p class="ayuda" id="pergamino-ayuda">Al guardarlo podrás colocar su pieza en el tablero.</p>
+    </div>
+  </div>
+
+  <!-- VICTORIA -->
+  <div class="modal modal--victoria" id="modal-victoria" hidden>
+    <canvas class="confeti" id="confeti" aria-hidden="true"></canvas>
+    <div class="modal__caja victoria" role="dialog" aria-modal="true" aria-labelledby="victoria-titulo">
+      <span class="victoria__sello" aria-hidden="true">
+        <svg class="icono" aria-hidden="true"><use href="#i-compass"/></svg>
+      </span>
+      <h2 class="victoria__titulo" id="victoria-titulo">Museo descubierto</h2>
+      <p class="victoria__mensaje" id="victoria-mensaje"></p>
+      <p class="victoria__resumen" id="victoria-resumen"></p>
+      <div class="victoria__acciones">
+        <button class="btn btn--primario" type="button" id="btn-otra-vez">Jugar otra vez</button>
+        <button class="btn btn--secundario" type="button" id="btn-ver-pergaminos">Ver mis pergaminos</button>
+        <button class="btn-fantasma" type="button" id="btn-cerrar-victoria">Volver al tablero</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRMAR REINICIO -->
+  <div class="modal" id="modal-confirmar" hidden>
+    <div class="modal__fondo" data-cerrar="confirmar"></div>
+    <div class="modal__caja modal__caja--compacta" role="dialog" aria-modal="true" aria-labelledby="confirmar-titulo">
+      <h2 id="confirmar-titulo">¿Reiniciar la partida?</h2>
+      <p class="modal__texto" id="confirmar-texto">Se borrarán los pergaminos y las piezas guardadas en este dispositivo. No se puede deshacer.</p>
+      <div class="modal__acciones">
+        <button class="btn btn--peligro" type="button" id="btn-confirmar-si">Sí, borrar todo</button>
+        <button class="btn btn--secundario" type="button" id="btn-confirmar-no">Mejor no</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <noscript>
+    <p class="sin-js">Este juego necesita JavaScript para funcionar. Actívalo en tu navegador y vuelve a cargar la página.</p>
+  </noscript>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

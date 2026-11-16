@@ -1,0 +1,21 @@
+REVERSOS DE LOS PERGAMINOS
+==========================
+
+Guarda aquí nueve archivos con estos nombres:
+
+  espalda-1.webp
+  espalda-2.webp
+  espalda-3.webp
+  espalda-4.webp
+  espalda-5.webp
+  espalda-6.webp
+  espalda-7.webp
+  espalda-8.webp
+  espalda-9.webp
+
+Cada archivo es la cara trasera del pergamino de ese escalón. Se muestra al girar
+la tarjeta, como fondo detrás del dato curioso. Cualquier proporción funciona: la
+imagen se recorta en cuadrado. Conviene que no tenga texto importante en el centro,
+porque el dato se lee encima.
+
+Cuando estén listas, abre js/data.js y cambia usarImagenesReales a true.

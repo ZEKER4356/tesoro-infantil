@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Brújula dorada sobre una placa de madera">
+  <rect width="512" height="512" rx="112" fill="#3E2723"/>
+  <circle cx="256" cy="256" r="178" fill="none" stroke="#D4AF37" stroke-width="10" opacity=".55"/>
+  <circle cx="256" cy="256" r="154" fill="#F4EBD0"/>
+  <circle cx="256" cy="256" r="132" fill="none" stroke="#3E2723" stroke-width="4" opacity=".18"/>
+  <path d="M256 116 L296 256 L216 256 Z" fill="#D4AF37"/>
+  <path d="M256 396 L216 256 L296 256 Z" fill="#3E2723"/>
+  <circle cx="256" cy="256" r="33" fill="#D4AF37"/>
+  <circle cx="256" cy="256" r="20" fill="#F4EBD0"/>
+</svg>

@@ -1,0 +1,19 @@
+PIEZAS DEL ROMPECABEZAS
+=========================
+
+Guarda aquí nueve archivos con estos nombres:
+
+  pieza-1.webp  (esquina superior izquierda)
+  pieza-2.webp  (arriba al centro)
+  pieza-3.webp  (esquina superior derecha)
+  pieza-4.webp  (centro a la izquierda)
+  pieza-5.webp  (centro)
+  pieza-6.webp  (centro a la derecha)
+  pieza-7.webp  (esquina inferior izquierda)
+  pieza-8.webp  (abajo al centro)
+  pieza-9.webp  (esquina inferior derecha)
+
+Las nueve deben ser recortes del mismo mural, cuadrados y sin margen entre sí.
+Cuando estén listas, abre js/data.js y cambia usarImagenesReales a true.
+
+Mientras la carpeta esté vacía, el juego usa los diseños de prueba y no falla.
