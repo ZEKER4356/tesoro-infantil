@@ -21,17 +21,25 @@ window.MUSEO = (function () {
     guia: {
       nombre: 'San Juan Nepomuceno',
       bienvenida:
-        '¡Hola, explorador! Soy San Juan Nepomuceno. En este museo hay nueve pergaminos ' +
-        'escondidos. Lanza el dado, busca el escalón y escanea su código. ¡Vamos juntos!',
-      regreso: '¡Hola otra vez! Toca continuar y seguimos la búsqueda.',
+        '¡Hola, pequeño explorador! Soy San Juan Nepomuceno. Toca el botón Iniciar ' +
+        'para comenzar nuestra aventura por el museo.',
+      regreso: '¡Hola otra vez, pequeño explorador! Toca Continuar y seguimos la búsqueda.',
       completo: '¡Qué alegría verte otra vez! Tu museo ya está completo. Puedes verlo en el tablero.',
-      dado: 'Toca el dado para saber a qué escalón ir.',
-      tablero: 'Toca una pieza de tu morral y luego la casilla donde crees que va.',
+      dado: '¡Es tu turno! Toca el dado mágico para descubrir a qué escalón debes caminar.',
+      dadoResultado: '¡Genial! Te salió el número {n}. Busca el escalón {n} y escanea su código.',
+      guardarPergamino: 'Guarda el pergamino del escalón {n} para seguir con la aventura.',
+      armar: '¡Ya tienes los nueve pergaminos! Ve al tablero a armar el rompecabezas del museo.',
+      escaner: 'Apunta la cámara de tu teléfono hacia el código QR que está pegado en el escalón.',
+      escanerError: '¡Ups! Ese es otro escalón. Sigue buscando el escalón {n}.',
+      pergamino: '¡Lo encontraste! Toca el pergamino para darle la vuelta y descubrir un secreto del museo.',
+      sabias: '¿Sabías que...?',
+      tablero: '¡Vamos a armar el misterio! Toca una de tus piezas y luego toca el cuadrito donde crees que va.',
       tableroVacio: 'Todavía no tienes piezas. Escanea el código de un escalón para conseguir la primera.',
       tableroCompleto: 'El museo está completo. ¡Buen trabajo, explorador!',
       pergaminos: 'Aquí guardas tus pergaminos. Toca uno para volver a escucharlo.',
       pergaminosVacio: 'Todavía no tienes pergaminos. Escanea el código de un escalón para conseguir el primero.',
-      datoEnPrueba: 'El dato curioso de este escalón todavía está en prueba.'
+      datoEnPrueba: 'El dato curioso de este escalón todavía está en prueba.',
+      victoria: '¡Lo lograste, gran explorador! Completaste todo el rompecabezas del museo.'
     },
 
     prefijoQR: 'MUSEO_ESCALON_',

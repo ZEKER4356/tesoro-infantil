@@ -83,15 +83,25 @@ Web Speech API del propio dispositivo (`speechSynthesis`), sin servicios externo
 archivos de audio. Prefiere una voz en español de Colombia, Latinoamérica o España, en
 ese orden.
 
+El guía vive en un botón flotante fijo, visible en todas las vistas del juego. Su
+diálogo cambia según el apartado y el momento: inicio, dado, resultado del dado,
+escáner, QR equivocado, pergamino, dato curioso, tablero y victoria.
+
+- Toca el avatar para abrir o cerrar la burbuja; el avatar nunca desaparece.
+- Cuando la burbuja taparía un botón principal, se pliega sola y deja un anillo
+  dorado en el avatar para recordar que puedes volver a abrirla.
+- Al abrir el escáner, el pergamino o la victoria, la burbuja se aparta para no cubrir
+  los botones del diálogo; el avatar sigue a la vista.
+- El botón 🔊 de la burbuja repite el texto actual. En los modales del pergamino y de
+  la victoria el botón equivalente hace lo mismo.
 - En el inicio da la bienvenida; si hay una partida guardada, recuerda cuántos
   pergaminos llevas.
 - Narra el resultado del dado, los errores de escaneo, el dato curioso del pergamino y
   el mensaje de victoria.
-- Cada globo tiene **Escuchar otra vez**. En los modales del pergamino y de la victoria
-  el botón repite el texto correspondiente.
-- Respeta el botón de sonido. Si está silenciado, **Escuchar otra vez** lo activa y
+- Respeta el botón de sonido. Si está silenciado, el botón de escuchar lo activa y
   vuelve a leer.
 - En el tablero también comenta la pieza elegida, los aciertos y los errores.
+- En `?admin=1` el guía se oculta para no estorbar la impresión de los QRs.
 
 Los textos se editan en `js/data.js`, dentro de `guia`. Los datos curiosos se narran
 desde `pergaminos`; mientras `esPlaceholder` sea `true`, la voz avisa que el dato está

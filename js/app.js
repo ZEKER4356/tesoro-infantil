@@ -22,9 +22,10 @@
 
   const el = {
     avatar: $('#avatarSanJuan'),
-    guiaInicioTexto: $('#guia-inicio-texto'),
-    guiaTableroTexto: $('#guia-tablero-texto'),
-    guiaPergaminosTexto: $('#guia-pergaminos-texto'),
+    guiaFlotante: $('#guia-flotante'),
+    guiaBurbuja: $('#guia-burbuja'),
+    guiaTexto: $('#guia-texto'),
+    btnAvatarGuia: $('#btn-avatar-guia'),
     btnOirPergamino: $('#btn-oir-pergamino'),
     btnOirVictoria: $('#btn-oir-victoria'),
 
@@ -39,7 +40,6 @@
     dado: $('#dado'),
     dadoNumero: $('#dado-numero'),
     dadoParadas: $('#dado-paradas'),
-    dadoEstado: $('#dado-estado'),
     btnLanzar: $('#btn-lanzar'),
     panelObjetivo: $('#panel-objetivo'),
     objetivoNumero: $('#objetivo-numero'),
@@ -299,7 +299,7 @@
     render();
     mostrarVista('juego');
     toast('Tu recorrido está listo. Lanza el dado.', 'exito');
-    hablar('Tu recorrido está listo, explorador. Lanza el dado para saber a qué escalón ir.');
+    decirGuia(DATA.guia.dado);
   }
 
   let motivoConfirmacion = 'reiniciar';
@@ -377,6 +377,108 @@
   const VISTAS = ['inicio', 'juego', 'tablero', 'pergaminos', 'admin'];
   const VISTAS_CON_NAV = ['juego', 'tablero', 'pergaminos'];
 
+  let vistaActual = 'inicio';
+  let guiaBurbujaAbierta = true;
+  let guiaBurbujaManual = false;
+
+  function aplicarPlantilla(texto, n) {
+    return String(texto).replace(/\{n\}/g, String(n));
+  }
+
+  function fijarGuia(texto) {
+    if (!el.guiaTexto) return;
+    el.guiaTexto.textContent = String(texto || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function textoGuiaVista(nombre) {
+    if (nombre === 'inicio') {
+      if (estado.terminado) return DATA.guia.completo;
+      if (estado.iniciado) {
+        return DATA.guia.regreso + ' Llevas ' + estado.recolectados.length + ' de ' + ETAPAS + ' pergaminos.';
+      }
+      return DATA.guia.bienvenida;
+    }
+
+    if (nombre === 'juego') {
+      const objetivo = objetivoActual();
+      if (estado.fase === 'buscar' && objetivo) return aplicarPlantilla(DATA.guia.dadoResultado, objetivo);
+      if (estado.fase === 'pendiente' && objetivo) return aplicarPlantilla(DATA.guia.guardarPergamino, objetivo);
+      if (estado.fase === 'armar') return DATA.guia.armar;
+      if (estado.fase === 'victoria') return DATA.guia.victoria;
+      return DATA.guia.dado;
+    }
+
+    if (nombre === 'tablero') {
+      if (estado.terminado) return DATA.guia.tableroCompleto;
+      if (estado.recolectados.length === 0) return DATA.guia.tableroVacio;
+      return DATA.guia.tablero;
+    }
+
+    if (nombre === 'pergaminos') {
+      return estado.recolectados.length ? DATA.guia.pergaminos : DATA.guia.pergaminosVacio;
+    }
+
+    return '';
+  }
+
+  function actualizarGuia(nombre) {
+    vistaActual = nombre || vistaActual;
+    if (vistaActual === 'admin') return;
+    fijarGuia(textoGuiaVista(vistaActual));
+  }
+
+  function decirGuia(texto) {
+    fijarGuia(texto);
+    if (!modalActivo) plegarBurbujaSiEstorba();
+    hablar(texto);
+  }
+
+  function alternarBurbuja() {
+    if (!el.guiaBurbuja) return;
+    guiaBurbujaManual = true;
+    guiaBurbujaAbierta = el.guiaBurbuja.hidden;
+    el.guiaBurbuja.hidden = !guiaBurbujaAbierta;
+    if (el.btnAvatarGuia) el.btnAvatarGuia.setAttribute('aria-expanded', String(guiaBurbujaAbierta));
+  }
+
+  const ACCIONES_GUIA = [
+    '#btn-iniciar',
+    '#btn-continuar',
+    '#btn-lanzar',
+    '#btn-escanear',
+    '#btn-ir-tablero',
+    '#btn-abrir-pendiente',
+    '#btn-victoria-final'
+  ];
+
+  function burbujaTapaAccion() {
+    if (!el.guiaBurbuja || el.guiaBurbuja.hidden) return false;
+    const burbuja = el.guiaBurbuja.getBoundingClientRect();
+    if (!burbuja.width || !burbuja.height) return false;
+
+    return ACCIONES_GUIA.some((selector) => {
+      const nodo = $(selector);
+      if (!nodo || nodo.hidden || !nodo.offsetParent) return false;
+      const caja = nodo.getBoundingClientRect();
+      if (!caja.width || !caja.height) return false;
+
+      const altoTapado = Math.min(caja.bottom, burbuja.bottom) - Math.max(caja.top, burbuja.top);
+      const anchoTapado = Math.min(caja.right, burbuja.right) - Math.max(caja.left, burbuja.left);
+      if (altoTapado <= 0 || anchoTapado <= 0) return false;
+
+      /* Solo se pliega cuando cubre una parte importante del botón. */
+      return altoTapado >= caja.height * 0.4 && anchoTapado >= caja.width * 0.5;
+    });
+  }
+
+  function plegarBurbujaSiEstorba() {
+    if (guiaBurbujaManual) return;
+    if (!burbujaTapaAccion()) return;
+    guiaBurbujaAbierta = false;
+    el.guiaBurbuja.hidden = true;
+    if (el.btnAvatarGuia) el.btnAvatarGuia.setAttribute('aria-expanded', 'false');
+  }
+
   function mostrarVista(nombre) {
     if (!VISTAS.includes(nombre)) nombre = 'inicio';
     VISTAS.forEach((vista) => {
@@ -398,7 +500,13 @@
 
     if (nombre !== 'tablero') seleccion = null;
     if (nombre === 'admin') generarQRs();
-    montarAvatar(nombre);
+    actualizarGuia(nombre);
+    if (!guiaBurbujaManual && el.guiaBurbuja) {
+      guiaBurbujaAbierta = true;
+      el.guiaBurbuja.hidden = false;
+      if (el.btnAvatarGuia) el.btnAvatarGuia.setAttribute('aria-expanded', 'true');
+      plegarBurbujaSiEstorba();
+    }
 
     window.scrollTo({ top: 0, behavior: REDUCIDO ? 'auto' : 'smooth' });
   }
@@ -419,6 +527,7 @@
     renderTablero();
     renderColeccion();
     sincronizarSonido();
+    actualizarGuia(vistaActual);
   }
 
   function renderInicio() {
@@ -443,17 +552,6 @@
 
     el.btnIniciar.textContent = hayPartida ? 'Empezar una búsqueda nueva' : 'Iniciar juego';
     el.btnReiniciar.hidden = !estado.iniciado;
-
-    if (el.guiaInicioTexto) {
-      if (enCurso) {
-        el.guiaInicioTexto.textContent =
-          DATA.guia.regreso + ' Llevas ' + estado.recolectados.length + ' de ' + ETAPAS + ' pergaminos.';
-      } else if (terminado) {
-        el.guiaInicioTexto.textContent = DATA.guia.completo;
-      } else {
-        el.guiaInicioTexto.textContent = DATA.guia.bienvenida;
-      }
-    }
   }
 
   function renderJuego() {
@@ -484,20 +582,6 @@
 
     el.avisoPendiente.hidden = estado.fase !== 'pendiente';
     el.avisoArmar.hidden = estado.fase !== 'armar';
-
-    if (estado.fase === 'inicio') {
-      el.dadoEstado.textContent = 'Lanza el dado para saber a qué escalón ir.';
-    } else if (estado.fase === 'tirar') {
-      el.dadoEstado.textContent = 'Lanza el dado para saber a qué escalón ir.';
-    } else if (estado.fase === 'buscar' && objetivo) {
-      el.dadoEstado.innerHTML = 'Ve al <strong>escalón ' + objetivo + '</strong> y escanea su QR.';
-    } else if (estado.fase === 'pendiente' && objetivo) {
-      el.dadoEstado.textContent = 'Guarda el pergamino del escalón ' + objetivo + ' para continuar.';
-    } else if (estado.fase === 'armar') {
-      el.dadoEstado.textContent = 'Ya tienes los nueve pergaminos. Arma el rompecabezas.';
-    } else if (estado.fase === 'victoria') {
-      el.dadoEstado.textContent = 'Museo completado. Buen trabajo, explorador.';
-    }
 
     renderDado();
   }
@@ -627,12 +711,6 @@
     }
 
     el.btnVictoriaFinal.hidden = !estado.terminado;
-
-    if (el.guiaTableroTexto) {
-      if (estado.terminado) el.guiaTableroTexto.textContent = DATA.guia.tableroCompleto;
-      else if (estado.recolectados.length === 0) el.guiaTableroTexto.textContent = DATA.guia.tableroVacio;
-      else el.guiaTableroTexto.textContent = DATA.guia.tablero;
-    }
   }
 
   function renderColeccion() {
@@ -659,12 +737,6 @@
       }
     }
     el.coleccion.innerHTML = fichas.join('');
-
-    if (el.guiaPergaminosTexto) {
-      el.guiaPergaminosTexto.textContent = estado.recolectados.length
-        ? DATA.guia.pergaminos
-        : DATA.guia.pergaminosVacio;
-    }
   }
 
   /* ---------- Dado ---------- */
@@ -710,15 +782,16 @@
       lanzando = false;
       guardar();
       renderJuego();
-      const frase = '¡Te salió el ' + n + '! Ve al escalón ' + n + ' y escanea su código.';
+      const frase = aplicarPlantilla(DATA.guia.dadoResultado, n);
       anunciar(frase);
-      hablar(frase);
+      decirGuia(frase);
       window.setTimeout(() => {
         el.panelObjetivo.scrollIntoView({
           behavior: REDUCIDO ? 'auto' : 'smooth',
           block: 'center'
         });
       }, 90);
+      window.setTimeout(plegarBurbujaSiEstorba, 520);
     }, duracion);
   }
 
@@ -781,8 +854,10 @@
       alCerrar: () => {
         escanerAbierto = false;
         detenerCamara();
+        actualizarGuia(vistaActual);
       }
     });
+    decirGuia(DATA.guia.escaner);
     await iniciarCamara();
   }
 
@@ -887,7 +962,7 @@
 
     if (!resultado) {
       reproducir('error');
-      mostrarErrorEscaner('Ese código no pertenece a esta búsqueda. Busca un QR que diga ' + DATA.prefijoQR + objetivo + '.');
+      mostrarErrorEscaner('Ese código no pertenece a esta búsqueda. Busca un QR que diga ' + DATA.prefijoQR + objetivo + '.', true);
       return;
     }
 
@@ -896,13 +971,14 @@
     if (escaneado !== objetivo) {
       reproducir('error');
       mostrarErrorEscaner(
-        'Ese es el escalón ' + escaneado + '. Tu dado te manda al escalón ' + objetivo + '. Búscalo un poco más allá.'
+        'Ese es el escalón ' + escaneado + '. Tu dado te manda al escalón ' + objetivo + '. Búscalo un poco más allá.',
+        true
       );
       return;
     }
 
     if (estado.recolectados.includes(escaneado)) {
-      mostrarErrorEscaner('Ya tienes el pergamino del escalón ' + escaneado + '. Lanza el dado para seguir.');
+      mostrarErrorEscaner('Ya tienes el pergamino del escalón ' + escaneado + '. Lanza el dado para seguir.', true);
       return;
     }
 
@@ -928,13 +1004,16 @@
     return 'No pudimos abrir la cámara. Revisa los permisos o usa el modo prueba con ?debug=1.';
   }
 
-  function mostrarErrorEscaner(mensaje) {
+  function mostrarErrorEscaner(mensaje, esCodigo) {
     el.escanerError.textContent = mensaje;
     el.escanerError.hidden = false;
     el.escanerCargando.hidden = true;
     el.btnReintentar.hidden = false;
     el.escanerMarco.classList.add('is-apagado');
-    hablar(mensaje, { avisar: true });
+    const objetivo = objetivoActual();
+    const voz = esCodigo && objetivo ? aplicarPlantilla(DATA.guia.escanerError, objetivo) : mensaje;
+    fijarGuia(voz);
+    hablar(voz, { avisar: true });
   }
 
   function limpiarErrorEscaner() {
@@ -980,10 +1059,10 @@
     el.btnGuardar.hidden = !esNuevo;
     el.pergaminoAyuda.hidden = !esNuevo;
 
-    abrirModal('pergamino');
-
-    const voz = datos.esPlaceholder ? DATA.guia.datoEnPrueba : datos.dato;
-    hablar('Escalón ' + id + '. ' + voz);
+    abrirModal('pergamino', {
+      alCerrar: () => actualizarGuia(vistaActual)
+    });
+    decirGuia(DATA.guia.pergamino);
   }
 
   function girarPergamino() {
@@ -991,6 +1070,16 @@
     el.flip.setAttribute('aria-pressed', String(volteado));
     el.btnGirar.textContent = volteado ? 'Ver el frente' : 'Ver la espalda';
     reproducir('papel');
+
+    if (volteado) {
+      const datos = DATA.pergaminos.find((p) => p.id === pergaminoActual);
+      if (datos) {
+        const voz = datos.esPlaceholder ? DATA.guia.datoEnPrueba : datos.dato;
+        decirGuia(DATA.guia.sabias + ' ' + voz);
+      }
+    } else {
+      fijarGuia(DATA.guia.pergamino);
+    }
   }
 
   function guardarPergamino() {
@@ -1022,7 +1111,7 @@
 
     anunciar(mensaje);
     toast(mensaje, 'exito');
-    hablar(mensaje);
+    decirGuia(mensaje);
   }
 
   /* ---------- Tablero ---------- */
@@ -1119,10 +1208,12 @@
   function abrirVictoria() {
     el.victoriaMensaje.textContent = DATA.mensajeFinal;
     el.victoriaResumen.textContent = ETAPAS + ' escalones, ' + ETAPAS + ' pergaminos y el museo completo.';
-    abrirModal('victoria');
+    abrirModal('victoria', {
+      alCerrar: () => actualizarGuia(vistaActual)
+    });
     reproducir('victoria');
     lanzarConfeti();
-    hablar(DATA.mensajeFinal);
+    decirGuia(DATA.guia.victoria);
   }
 
   /* ---------- Confeti ---------- */
@@ -1285,8 +1376,7 @@
     sincronizarSonido();
     if (estado.sonido) {
       reproducir('camara');
-      const globo = $('.vista.is-activa .guia');
-      const texto = textoDelGlobo(globo);
+      const texto = el.guiaTexto ? el.guiaTexto.textContent : '';
       if (texto) hablar(texto);
     } else {
       detenerVoz();
@@ -1465,14 +1555,8 @@
     }
   }
 
-  function textoDelGlobo(globo) {
-    const nodo = globo ? $('[data-guia-texto]', globo) : null;
-    return nodo ? String(nodo.textContent || '').replace(/\s+/g, ' ').trim() : '';
-  }
-
   function decirTablero(mensaje) {
-    if (el.guiaTableroTexto) el.guiaTableroTexto.textContent = mensaje;
-    hablar(mensaje);
+    decirGuia(mensaje);
   }
 
   function repetirTexto(texto) {
@@ -1495,20 +1579,16 @@
     if (!pergaminoActual) return;
     const datos = DATA.pergaminos.find((p) => p.id === pergaminoActual);
     if (!datos) return;
-    const voz = datos.esPlaceholder ? DATA.guia.datoEnPrueba : datos.dato;
-    repetirTexto('Escalón ' + pergaminoActual + '. ' + voz);
+    if (el.flip.classList.contains('is-volteado')) {
+      const voz = datos.esPlaceholder ? DATA.guia.datoEnPrueba : datos.dato;
+      repetirTexto(DATA.guia.sabias + ' ' + voz);
+    } else {
+      repetirTexto(DATA.guia.pergamino);
+    }
   }
 
   function repetirVictoria() {
     repetirTexto(DATA.mensajeFinal);
-  }
-
-  function montarAvatar(vista) {
-    if (!el.avatar) return;
-    const seccion = document.getElementById('vista-' + vista);
-    const hueco = seccion ? $('[data-guia-hueco]', seccion) : null;
-    if (!hueco) return;
-    if (el.avatar.parentElement !== hueco) hueco.appendChild(el.avatar);
   }
 
   /* ---------- Modales y avisos ---------- */
@@ -1525,6 +1605,12 @@
     ultimoFoco = document.activeElement;
     modal.hidden = false;
     document.body.classList.add('modal-abierto');
+    if (el.guiaBurbuja && !el.guiaBurbuja.hidden) {
+      /* La burbuja se aparta para no tapar los botones del diálogo. */
+      guiaBurbujaAbierta = false;
+      el.guiaBurbuja.hidden = true;
+      if (el.btnAvatarGuia) el.btnAvatarGuia.setAttribute('aria-expanded', 'false');
+    }
     modalActivo = { nombre: nombre, modal: modal, alCerrar: opciones && opciones.alCerrar };
     const primero = $('[data-foco-inicial]', modal) || $(FOCALIZABLES, modal);
     if (primero) window.setTimeout(() => primero.focus({ preventScroll: true }), 40);
@@ -1579,9 +1665,8 @@
   }
 
   function anunciar(mensaje) {
-    const region = el.dadoEstado;
-    if (!region) return;
-    region.textContent = mensaje;
+    if (!el.guiaTexto) return;
+    el.guiaTexto.textContent = mensaje;
   }
 
   /* ---------- Admin ---------- */
@@ -1701,6 +1786,8 @@
       abrirConfirmacion('reiniciar');
     });
 
+    if (el.btnAvatarGuia) el.btnAvatarGuia.addEventListener('click', alternarBurbuja);
+
     el.btnConfirmarSi.addEventListener('click', confirmarBorrado);
     el.btnConfirmarNo.addEventListener('click', () => cerrarModal('confirmar'));
 
@@ -1777,7 +1864,7 @@
       if (ir) mostrarVista(ir.dataset.ir);
       const oir = evento.target.closest('[data-guia-oir]');
       if (oir) {
-        repetirTexto(textoDelGlobo(oir.closest('.guia')));
+        repetirTexto(el.guiaTexto ? el.guiaTexto.textContent : '');
         return;
       }
       const sonido = evento.target.closest('[data-accion="sonido"]');
