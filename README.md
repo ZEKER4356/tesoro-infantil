@@ -76,6 +76,22 @@ son marcadores visibles, no contenido real del museo. Cuando tengas los nueve da
 
 El título de la aventura y el mensaje final también están en `js/data.js`.
 
+## Modos de juego
+
+En la pantalla inicial se elige cómo jugar:
+
+- **Modo Digital**: usa el dado virtual de nueve caras, que recorre los escalones
+  sin repetir. Es el flujo original, sin cambios.
+- **Modo Físico**: el niño lanza el dado real del museo y toca en pantalla el número
+  que le salió. Los números ya conseguidos muestran un ✓ verde; si repite, San Juan
+  le recuerda esperar el siguiente turno. Al elegir un número nuevo se habilita el
+  escaneo de ese escalón.
+
+La elección se guarda en `localStorage` (clave `museo_v1`) como
+`modoJuego: 'digital' | 'fisico'`. Las partidas guardadas antiguas se abren en Modo
+Digital. Si ya hay una partida y se elige otro modo, la app pide confirmación antes de
+borrarla.
+
 ## Voz y guía
 
 San Juan Nepomuceno acompaña la partida con un globo de diálogo y voz. La voz usa la

@@ -197,7 +197,28 @@
           <span id="continuar-etiqueta">Continuar la búsqueda</span>
           <span class="btn__detalle" id="continuar-detalle"></span>
         </button>
-        <button class="btn btn--primario btn--grande" type="button" id="btn-iniciar">Iniciar juego</button>
+
+        <div class="inicio__modos">
+          <p class="inicio__modos-titulo" id="modos-titulo">¿Cómo quieres jugar?</p>
+          <div class="modo-opciones">
+            <button class="modo-btn modo-btn--digital" type="button" id="btn-modo-digital"
+                    aria-label="Modo Digital: juega con el dado virtual de la pantalla">
+              <span class="modo-btn__emoji" aria-hidden="true">🎲</span>
+              <span class="modo-btn__texto">
+                <span class="modo-btn__nombre">Modo Digital</span>
+                <span class="modo-btn__detalle">Juega con el dado virtual de la pantalla</span>
+              </span>
+            </button>
+            <button class="modo-btn modo-btn--fisico" type="button" id="btn-modo-fisico"
+                    aria-label="Modo Físico: juega con el dado real del museo">
+              <span class="modo-btn__emoji" aria-hidden="true">🏛️</span>
+              <span class="modo-btn__texto">
+                <span class="modo-btn__nombre">Modo Físico</span>
+                <span class="modo-btn__detalle">Juega con el dado real del museo</span>
+              </span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <ol class="pasos">
@@ -249,8 +270,15 @@
         <button class="btn btn--primario btn--grande" type="button" id="btn-lanzar">Lanzar el dado</button>
       </div>
 
+      <div class="panel panel--fisico" id="panel-fisico" hidden>
+        <p class="panel__titulo">Dado físico del museo</p>
+        <p class="fisico__instruccion" id="fisico-instruccion">¡Lanza el dado físico! Luego toca aquí el número que te salió.</p>
+        <div class="fisico__numeros" id="fisico-numeros" role="group"
+             aria-label="Elige el número que salió en el dado físico"></div>
+      </div>
+
       <div class="panel panel--objetivo" id="panel-objetivo" hidden>
-        <p class="objetivo__etiqueta">Tu dado marca</p>
+        <p class="objetivo__etiqueta" id="objetivo-etiqueta">Tu dado marca</p>
         <p class="objetivo__numero">Escalón <strong id="objetivo-numero">1</strong></p>
         <button class="btn btn--primario btn--grande" type="button" id="btn-escanear">Escanear el QR del escalón</button>
         <button class="btn btn--secundario" type="button" id="btn-simular" data-debug hidden>Simular escaneo (modo prueba)</button>

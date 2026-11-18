@@ -21,12 +21,15 @@ window.MUSEO = (function () {
     guia: {
       nombre: 'San Juan Nepomuceno',
       bienvenida:
-        '¡Hola, pequeño explorador! Soy San Juan Nepomuceno. Toca el botón Iniciar ' +
-        'para comenzar nuestra aventura por el museo.',
+        '¡Hola, pequeño explorador! Soy San Juan Nepomuceno. Elige cómo quieres jugar: ' +
+        'con el dado virtual o con el dado físico del museo.',
       regreso: '¡Hola otra vez, pequeño explorador! Toca Continuar y seguimos la búsqueda.',
       completo: '¡Qué alegría verte otra vez! Tu museo ya está completo. Puedes verlo en el tablero.',
       dado: '¡Es tu turno! Toca el dado mágico para descubrir a qué escalón debes caminar.',
       dadoResultado: '¡Genial! Te salió el número {n}. Busca el escalón {n} y escanea su código.',
+      fisico: '¡Lanza el dado físico! Luego toca aquí el número que te salió.',
+      fisicoResultado: '¡Genial! Te salió el número {n}. Ve al escalón {n} y escanea su código QR.',
+      fisicoRepetido: '¡Uy, te volvió a salir el número {n}! Como ya tienes ese pergamino en tu inventario, te quedas aquí y esperas tu siguiente turno para lanzar el dado otra vez.',
       guardarPergamino: 'Guarda el pergamino del escalón {n} para seguir con la aventura.',
       armar: '¡Ya tienes los nueve pergaminos! Ve al tablero a armar el rompecabezas del museo.',
       escaner: 'Apunta la cámara de tu teléfono hacia el código QR que está pegado en el escalón.',
