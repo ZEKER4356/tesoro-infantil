@@ -744,7 +744,7 @@ body.modal-abierto .guia-flotante .guia-flotante__btn .avatar-contenedor {
   box-shadow: 0 1px 0 rgba(62, 39, 35, .24);
 }
 
-.modo-btn__emoji {
+.modo-btn__icono {
   display: grid;
   place-items: center;
   flex: 0 0 auto;
@@ -752,11 +752,16 @@ body.modal-abierto .guia-flotante .guia-flotante__btn .avatar-contenedor {
   height: 48px;
   border-radius: 50%;
   background: rgba(62, 39, 35, .08);
-  font-size: 1.55rem;
-  line-height: 1;
+  color: var(--madera);
 }
 
-.modo-btn--digital .modo-btn__emoji {
+.modo-btn__icono .icono {
+  width: 26px;
+  height: 26px;
+  stroke-width: 1.7;
+}
+
+.modo-btn--digital .modo-btn__icono {
   background: rgba(255, 255, 255, .42);
 }
 
@@ -1587,6 +1592,63 @@ body.modal-abierto {
 
 .modal__caja--compacta {
   max-width: 420px;
+}
+
+/* ---------- Modal de selección de modo ---------- */
+
+.modal--modo {
+  z-index: 90;
+}
+
+.modal--modo .modal__fondo {
+  background: rgba(20, 12, 10, .78);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.modal__caja--modo {
+  max-width: 460px;
+  padding: 24px 18px 20px;
+  text-align: center;
+}
+
+.modo-modal__marca {
+  font-family: var(--fuente-titulo);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--dorado-texto);
+}
+
+.modo-modal__titulo {
+  margin-top: 8px;
+  font-family: var(--fuente-titulo);
+  font-size: clamp(1.55rem, 6.4vw, 2.05rem);
+  font-weight: 600;
+  line-height: 1.12;
+  color: var(--madera);
+}
+
+.modo-modal__texto {
+  margin-top: 8px;
+  font-size: .95rem;
+  color: var(--tinta-suave);
+}
+
+.modo-opciones--modal {
+  margin-top: 18px;
+  text-align: left;
+}
+
+.modo-btn--grande {
+  min-height: 84px;
+}
+
+.modo-modal__pie {
+  margin-top: 14px;
+  font-size: .78rem;
+  color: var(--tinta-tenue);
 }
 
 .modal__acciones {

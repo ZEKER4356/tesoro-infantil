@@ -32,6 +32,8 @@
     nav: $('#nav-inferior'),
     btnModoDigital: $('#btn-modo-digital'),
     btnModoFisico: $('#btn-modo-fisico'),
+    btnModalDigital: $('#btn-modal-digital'),
+    btnModalFisico: $('#btn-modal-fisico'),
     modosTitulo: $('#modos-titulo'),
     btnContinuar: $('#btn-continuar'),
     continuarEtiqueta: $('#continuar-etiqueta'),
@@ -346,11 +348,18 @@
 
   function elegirModo(modo) {
     modoPendiente = modo === 'fisico' ? 'fisico' : 'digital';
+    desbloquearAudio();
+    if (modalActivo && modalActivo.nombre === 'modo') cerrarModal('modo');
     if (estado.iniciado) {
       abrirConfirmacion('nueva');
     } else {
       iniciarPartida(modoPendiente);
     }
+  }
+
+  function abrirModalModo() {
+    if (ES_ADMIN || estado.iniciado) return;
+    abrirModal('modo');
   }
 
   function reiniciarTotal() {
@@ -361,6 +370,7 @@
     render();
     mostrarVista('inicio');
     toast('Partida borrada. Lista para el siguiente explorador.');
+    abrirModalModo();
   }
 
   /* ---------- Rutas e imágenes ---------- */
@@ -1520,7 +1530,9 @@
 
   /* ---------- Voz y guía ---------- */
 
-  const CODIGOS_VOZ = ['es-CO', 'es-419', 'es-MX', 'es-US', 'es-ES'];
+  const ORDEN_VOZ = ['es-co', 'es-419', 'es-mx', 'es-us', 'es-es'];
+  const VOCES_MASCULINAS = ['jorge', 'pablo', 'raul', 'alvaro', 'diego', 'carlos', 'juan', 'google espanol'];
+  const VOCES_FEMENINAS = ['helena', 'sabina', 'paulina', 'monica', 'laura', 'sofia'];
   let vozElegida = null;
   let vozToken = 0;
   let vozTemporizador = null;
@@ -1530,22 +1542,47 @@
     return 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function';
   }
 
+  function normalizarNombreVoz(voz) {
+    return String((voz && voz.name) || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function puntajeVoz(voz) {
+    const nombre = normalizarNombreVoz(voz);
+    const lang = String(voz.lang || '').toLowerCase();
+    let puntos = 0;
+    if (VOCES_MASCULINAS.some((clave) => nombre.includes(clave))) puntos += 100;
+    const posicion = ORDEN_VOZ.findIndex((codigo) => lang.startsWith(codigo));
+    if (posicion !== -1) puntos += (ORDEN_VOZ.length - posicion) * 10;
+    else if (lang.startsWith('es')) puntos += 5;
+    if (voz.localService) puntos += 1;
+    return puntos;
+  }
+
   function cargarVoces() {
     if (!vozDisponible()) return;
-    const lista = window.speechSynthesis.getVoices();
-    if (!lista || !lista.length) return;
+    const lista = window.speechSynthesis.getVoices() || [];
+    if (!lista.length) return;
 
-    vozElegida = null;
-    for (const codigo of CODIGOS_VOZ) {
-      const encontrada = lista.find((voz) =>
-        String(voz.lang || '').toLowerCase().startsWith(codigo.toLowerCase())
-      );
-      if (encontrada) {
-        vozElegida = encontrada;
-        return;
+    const espanolas = lista.filter((voz) => /^es/i.test(String(voz.lang || '')));
+    const masculinas = espanolas.filter(
+      (voz) => !VOCES_FEMENINAS.some((clave) => normalizarNombreVoz(voz).includes(clave))
+    );
+
+    /* Se prioriza una voz masculina en español; si no existe, se usa la primera en español. */
+    const candidatas = masculinas.length ? masculinas : espanolas.length ? espanolas : lista;
+    let mejor = candidatas[0];
+    let mejorPuntos = puntajeVoz(mejor);
+    candidatas.forEach((voz) => {
+      const puntos = puntajeVoz(voz);
+      if (puntos > mejorPuntos) {
+        mejor = voz;
+        mejorPuntos = puntos;
       }
-    }
-    vozElegida = lista.find((voz) => /^es/i.test(String(voz.lang || ''))) || null;
+    });
+    vozElegida = mejor || null;
   }
 
   if (vozDisponible()) {
@@ -1609,6 +1646,28 @@
     return trozos.length ? trozos : [String(texto)];
   }
 
+  // El primer toque del niño desbloquea Web Audio y la voz del sistema.
+  function desbloquearAudio() {
+    try {
+      const ctx = contextoAudio();
+      if (ctx && ctx.state === 'suspended') ctx.resume();
+    } catch (error) {
+      /* sin Web Audio */
+    }
+    if (!vozDisponible()) return;
+    try {
+      window.speechSynthesis.getVoices();
+      if (!window.speechSynthesis.speaking && !window.speechSynthesis.pending) {
+        const silencio = new window.SpeechSynthesisUtterance(' ');
+        silencio.volume = 0.01;
+        silencio.rate = 1;
+        window.speechSynthesis.speak(silencio);
+      }
+    } catch (error) {
+      /* sin voz disponible */
+    }
+  }
+
   function hablar(texto, opciones) {
     const limpio = String(texto || '').replace(/\s+/g, ' ').trim();
     if (!limpio) return;
@@ -1658,8 +1717,8 @@
         } else {
           frase.lang = 'es-CO';
         }
-        frase.rate = 0.94;
-        frase.pitch = 1.04;
+        frase.rate = 0.95;
+        frase.pitch = 0.85;
         frase.volume = 1;
         frase.onstart = arrancar;
 
@@ -1896,6 +1955,8 @@
   function conectarEventos() {
     el.btnModoDigital.addEventListener('click', () => elegirModo('digital'));
     el.btnModoFisico.addEventListener('click', () => elegirModo('fisico'));
+    el.btnModalDigital.addEventListener('click', () => elegirModo('digital'));
+    el.btnModalFisico.addEventListener('click', () => elegirModo('fisico'));
 
     el.fisicoNumeros.addEventListener('click', (evento) => {
       const boton = evento.target.closest('[data-numero]');
@@ -2009,7 +2070,8 @@
     document.addEventListener('keydown', (evento) => {
       if (evento.key === 'Escape' && modalActivo) {
         evento.preventDefault();
-        cerrarModal(modalActivo.nombre);
+        /* La elección de modo es obligatoria: Escape no la cierra. */
+        if (modalActivo.nombre !== 'modo') cerrarModal(modalActivo.nombre);
         return;
       }
       if (evento.key === 'Tab' && modalActivo) atraparFoco(evento, modalActivo.modal);
@@ -2075,6 +2137,7 @@
     else mostrarVista('inicio');
 
     if (!ES_ADMIN && !estado.iniciado) {
+      abrirModalModo();
       window.setTimeout(() => {
         if (estado.iniciado || document.hidden || modalActivo) return;
         hablar(DATA.guia.bienvenida);

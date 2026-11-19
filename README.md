@@ -78,7 +78,10 @@ El título de la aventura y el mensaje final también están en `js/data.js`.
 
 ## Modos de juego
 
-En la pantalla inicial se elige cómo jugar:
+Al entrar sin una partida guardada (o después de reiniciar) aparece un modal
+bloqueante que pregunta **«¿Cómo vas a jugar hoy?»**. La elección se puede cambiar
+después desde la pantalla inicial; si ya hay una partida, se pide confirmación antes
+de borrarla.
 
 - **Modo Digital**: usa el dado virtual de nueve caras, que recorre los escalones
   sin repetir. Es el flujo original, sin cambios.
@@ -89,8 +92,7 @@ En la pantalla inicial se elige cómo jugar:
 
 La elección se guarda en `localStorage` (clave `museo_v1`) como
 `modoJuego: 'digital' | 'fisico'`. Las partidas guardadas antiguas se abren en Modo
-Digital. Si ya hay una partida y se elige otro modo, la app pide confirmación antes de
-borrarla.
+Digital.
 
 ## Voz y guía
 
