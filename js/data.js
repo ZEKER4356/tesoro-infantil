@@ -27,9 +27,6 @@ window.MUSEO = (function () {
       completo: '¡Qué alegría verte otra vez! Tu museo ya está completo. Puedes verlo en el tablero.',
       dado: '¡Es tu turno! Toca el dado mágico para descubrir a qué escalón debes caminar.',
       dadoResultado: '¡Genial! Te salió el número {n}. Busca el escalón {n} y escanea su código.',
-      fisico: '¡Lanza el dado físico! Luego toca aquí el número que te salió.',
-      fisicoResultado: '¡Genial! Te salió el número {n}. Ve al escalón {n} y escanea su código QR.',
-      fisicoRepetido: '¡Uy, te volvió a salir el número {n}! Como ya tienes ese pergamino en tu inventario, te quedas aquí y esperas tu siguiente turno para lanzar el dado otra vez.',
       guardarPergamino: 'Guarda el pergamino del escalón {n} para seguir con la aventura.',
       armar: '¡Ya tienes los nueve pergaminos! Ve al tablero a armar el rompecabezas del museo.',
       escaner: 'Apunta la cámara de tu teléfono hacia el código QR que está pegado en el escalón.',
@@ -42,6 +39,21 @@ window.MUSEO = (function () {
       pergaminos: 'Aquí guardas tus pergaminos. Toca uno para volver a escucharlo.',
       pergaminosVacio: 'Todavía no tienes pergaminos. Escanea el código de un escalón para conseguir el primero.',
       datoEnPrueba: 'El dato curioso de este escalón todavía está en prueba.',
+      fisicoVista:
+        'Estas son las instrucciones y las reglas del juego físico. Toca «Escuchar las instrucciones» y te las leo completas.',
+      fisicoInstrucciones:
+        'Instrucciones del juego físico. ¿Cómo se juega? Uno: el adulto a cargo de los niños escanea el código QR para ver las instrucciones. ' +
+        'Dos: ordena el rompecabezas en cada escalón. ' +
+        'Tres: comienzan todos en la casilla de salida. ' +
+        'Cuatro: por turnos lanzan el dado. ' +
+        'Cinco: avanzan el número de casillas que indica el dado. ' +
+        'Seis: cuando hay una pieza, la levantan y leen el dato histórico, con ayuda de un adulto si es necesario. ' +
+        'Siete: el juego termina cuando se han conseguido todas las piezas y se completa el rompecabezas. ' +
+        'Reglas generales. Uno: respetar los turnos. ' +
+        'Dos: cuidar los materiales. ' +
+        'Tres: escuchar las instrucciones. ' +
+        'Cuatro: no correr ni empujar. ' +
+        'Cinco: ninguno de los participantes podrá subir o bajar escaleras sin que esté acompañado de un adulto.',
       victoria: '¡Lo lograste, gran explorador! Completaste todo el rompecabezas del museo.'
     },
 

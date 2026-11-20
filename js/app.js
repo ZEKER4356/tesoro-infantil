@@ -10,6 +10,7 @@
   const PARAMS = new URLSearchParams(window.location.search);
   const ES_ADMIN = PARAMS.get('admin') === '1';
   const ES_DEBUG = PARAMS.get('debug') === '1';
+  const MODO_FISICO_URL = PARAMS.get('modo') === 'fisico';
   const REDUCIDO = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const URL_ESCANER = 'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js';
@@ -28,6 +29,8 @@
     btnAvatarGuia: $('#btn-avatar-guia'),
     btnOirPergamino: $('#btn-oir-pergamino'),
     btnOirVictoria: $('#btn-oir-victoria'),
+    btnOirFisico: $('#btn-oir-fisico'),
+    btnVolverFisico: $('#btn-volver-fisico'),
 
     nav: $('#nav-inferior'),
     btnModoDigital: $('#btn-modo-digital'),
@@ -46,9 +49,6 @@
     dadoNumero: $('#dado-numero'),
     dadoParadas: $('#dado-paradas'),
     btnLanzar: $('#btn-lanzar'),
-    panelFisico: $('#panel-fisico'),
-    fisicoInstruccion: $('#fisico-instruccion'),
-    fisicoNumeros: $('#fisico-numeros'),
     panelObjetivo: $('#panel-objetivo'),
     objetivoEtiqueta: $('#objetivo-etiqueta'),
     objetivoNumero: $('#objetivo-numero'),
@@ -105,6 +105,8 @@
     adminEstado: $('#admin-estado'),
     qrMaestro: $('#qr-maestro'),
     qrMaestroUrl: $('#qr-maestro-url'),
+    qrFisico: $('#qr-fisico'),
+    qrFisicoUrl: $('#qr-fisico-url'),
     qrGrid: $('#qr-grid')
   };
 
@@ -122,7 +124,6 @@
     return {
       v: 1,
       iniciado: false,
-      modoJuego: 'digital',
       cola: [],
       ronda: 0,
       fase: 'inicio',
@@ -167,7 +168,6 @@
     const e = Object.assign(estadoNuevo(), obj);
     e.v = 1;
     e.iniciado = obj.iniciado === true;
-    e.modoJuego = obj.modoJuego === 'fisico' ? 'fisico' : 'digital';
     e.sonido = obj.sonido !== false;
     e.recolectados = unicos(obj.recolectados).filter(esEscalon);
 
@@ -297,13 +297,11 @@
     }
   }
 
-  function iniciarPartida(modo) {
-    const modoJuego = modo === 'fisico' ? 'fisico' : 'digital';
+  function iniciarPartida() {
     borrarPartida();
     const sonidoActivo = estado.sonido;
     estado = estadoNuevo();
     estado.iniciado = true;
-    estado.modoJuego = modoJuego;
     estado.fase = 'tirar';
     estado.cola = barajarEscalones();
     estado.sonido = sonidoActivo;
@@ -311,25 +309,18 @@
     guardar();
     render();
     mostrarVista('juego');
-    toast(
-      modoJuego === 'fisico'
-        ? 'Tu recorrido está listo. Lanza el dado físico.'
-        : 'Tu recorrido está listo. Lanza el dado.',
-      'exito'
-    );
-    decirGuia(modoJuego === 'fisico' ? DATA.guia.fisico : DATA.guia.dado);
+    toast('Tu recorrido está listo. Lanza el dado.', 'exito');
+    decirGuia(DATA.guia.dado);
   }
 
   let motivoConfirmacion = 'reiniciar';
-  let modoPendiente = 'digital';
 
   function abrirConfirmacion(motivo) {
     motivoConfirmacion = motivo;
     const esNueva = motivo === 'nueva';
     $('#confirmar-titulo').textContent = esNueva ? '¿Empezar una búsqueda nueva?' : '¿Reiniciar la partida?';
     $('#confirmar-texto').textContent = esNueva
-      ? 'Se borrarán los pergaminos y las piezas de la partida actual en este dispositivo. Empezarás una búsqueda nueva en ' +
-        (modoPendiente === 'fisico' ? 'Modo Físico.' : 'Modo Digital.')
+      ? 'Se borrarán los pergaminos y las piezas de la partida actual en este dispositivo. Empezarás una búsqueda nueva en Modo Digital.'
       : 'Se borrarán los pergaminos y las piezas guardadas en este dispositivo. No se puede deshacer.';
     el.btnConfirmarSi.textContent = esNueva ? 'Sí, empezar de nuevo' : 'Sí, borrar todo';
     abrirModal('confirmar');
@@ -340,26 +331,50 @@
     motivoConfirmacion = 'reiniciar';
     cerrarModal('confirmar');
     if (accion === 'nueva') {
-      iniciarPartida(modoPendiente);
+      iniciarPartida();
       return;
     }
     reiniciarTotal();
   }
 
   function elegirModo(modo) {
-    modoPendiente = modo === 'fisico' ? 'fisico' : 'digital';
     desbloquearAudio();
     if (modalActivo && modalActivo.nombre === 'modo') cerrarModal('modo');
+    if (modo === 'fisico') {
+      /* El modo físico solo muestra instrucciones: nunca toca la partida guardada. */
+      mostrarVista('fisico');
+      return;
+    }
     if (estado.iniciado) {
       abrirConfirmacion('nueva');
     } else {
-      iniciarPartida(modoPendiente);
+      iniciarPartida();
     }
   }
 
   function abrirModalModo() {
     if (ES_ADMIN || estado.iniciado) return;
     abrirModal('modo');
+  }
+
+  function quitarParametroModo() {
+    if (!window.history || typeof window.history.replaceState !== 'function') return;
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has('modo')) return;
+    url.searchParams.delete('modo');
+    const busqueda = url.searchParams.toString();
+    window.history.replaceState({}, '', url.pathname + (busqueda ? '?' + busqueda : '') + url.hash);
+  }
+
+  function volverDelFisico() {
+    quitarParametroModo();
+    mostrarVista('inicio');
+    if (!estado.iniciado) abrirModalModo();
+  }
+
+  function leerInstruccionesFisicas() {
+    fijarGuia(DATA.guia.fisicoVista);
+    hablar(DATA.guia.fisicoInstrucciones, { forzar: true });
   }
 
   function reiniciarTotal() {
@@ -411,7 +426,7 @@
 
   /* ---------- Vistas ---------- */
 
-  const VISTAS = ['inicio', 'juego', 'tablero', 'pergaminos', 'admin'];
+  const VISTAS = ['inicio', 'fisico', 'juego', 'tablero', 'pergaminos', 'admin'];
   const VISTAS_CON_NAV = ['juego', 'tablero', 'pergaminos'];
 
   let vistaActual = 'inicio';
@@ -438,15 +453,16 @@
 
     if (nombre === 'juego') {
       const objetivo = objetivoActual();
-      const fisico = estado.modoJuego === 'fisico';
       if (estado.fase === 'buscar' && objetivo) {
-        return aplicarPlantilla(fisico ? DATA.guia.fisicoResultado : DATA.guia.dadoResultado, objetivo);
+        return aplicarPlantilla(DATA.guia.dadoResultado, objetivo);
       }
       if (estado.fase === 'pendiente' && objetivo) return aplicarPlantilla(DATA.guia.guardarPergamino, objetivo);
       if (estado.fase === 'armar') return DATA.guia.armar;
       if (estado.fase === 'victoria') return DATA.guia.victoria;
-      return fisico ? DATA.guia.fisico : DATA.guia.dado;
+      return DATA.guia.dado;
     }
+
+    if (nombre === 'fisico') return DATA.guia.fisicoVista;
 
     if (nombre === 'tablero') {
       if (estado.terminado) return DATA.guia.tableroCompleto;
@@ -481,19 +497,11 @@
     if (el.btnAvatarGuia) el.btnAvatarGuia.setAttribute('aria-expanded', String(guiaBurbujaAbierta));
   }
 
-  function abrirBurbujaGuia() {
-    if (!el.guiaBurbuja) return;
-    guiaBurbujaAbierta = true;
-    el.guiaBurbuja.hidden = false;
-    if (el.btnAvatarGuia) el.btnAvatarGuia.setAttribute('aria-expanded', 'true');
-  }
-
   const ACCIONES_GUIA = [
     '#btn-modo-digital',
     '#btn-modo-fisico',
     '#btn-continuar',
     '#btn-lanzar',
-    '.fisico__numero',
     '#btn-escanear',
     '#btn-ir-tablero',
     '#btn-abrir-pendiente',
@@ -551,7 +559,12 @@
     if (nombre !== 'tablero') seleccion = null;
     if (nombre === 'admin') generarQRs();
     actualizarGuia(nombre);
-    if (!guiaBurbujaManual && el.guiaBurbuja) {
+    if (nombre === 'fisico') {
+      /* El pergamino manda: la burbuja empieza cerrada y el botón la abre si hace falta. */
+      guiaBurbujaAbierta = false;
+      if (el.guiaBurbuja) el.guiaBurbuja.hidden = true;
+      if (el.btnAvatarGuia) el.btnAvatarGuia.setAttribute('aria-expanded', 'false');
+    } else if (!guiaBurbujaManual && el.guiaBurbuja) {
       guiaBurbujaAbierta = true;
       el.guiaBurbuja.hidden = false;
       if (el.btnAvatarGuia) el.btnAvatarGuia.setAttribute('aria-expanded', 'true');
@@ -618,20 +631,16 @@
       el.progreso.appendChild(item);
     }
 
-    const fisico = estado.modoJuego === 'fisico';
     const enMarcha = estado.fase === 'buscar' || estado.fase === 'pendiente';
-    el.panelDado.hidden = fisico;
-    el.panelFisico.hidden = !fisico || estado.fase === 'armar' || estado.fase === 'victoria';
+    el.panelDado.hidden = false;
     el.panelObjetivo.hidden = !enMarcha;
-    el.btnLanzar.hidden = fisico || estado.fase !== 'tirar';
+    el.btnLanzar.hidden = estado.fase !== 'tirar';
     el.btnLanzar.disabled = estado.fase !== 'tirar' || lanzando;
 
     if (objetivo) {
-      el.objetivoEtiqueta.textContent = fisico ? 'Tu dado físico marca' : 'Tu dado marca';
+      el.objetivoEtiqueta.textContent = 'Tu dado marca';
       el.objetivoNumero.textContent = String(objetivo);
-      el.btnEscanear.textContent = fisico
-        ? 'Escanear QR del Escalón ' + objetivo
-        : 'Escanear el QR del escalón ' + objetivo;
+      el.btnEscanear.textContent = 'Escanear el QR del escalón ' + objetivo;
       el.btnEscanear.disabled = estado.fase !== 'buscar';
       el.btnEscanear.hidden = estado.fase === 'pendiente';
     }
@@ -639,92 +648,7 @@
     el.avisoPendiente.hidden = estado.fase !== 'pendiente';
     el.avisoArmar.hidden = estado.fase !== 'armar';
 
-    if (fisico) renderFisico();
     renderDado();
-  }
-
-  function renderFisico() {
-    if (!el.panelFisico || !el.fisicoNumeros) return;
-    el.fisicoInstruccion.textContent = DATA.guia.fisico;
-
-    const objetivo = objetivoActual();
-    const esperando = estado.fase === 'tirar';
-    const fragmento = document.createDocumentFragment();
-
-    for (let n = 1; n <= ETAPAS; n += 1) {
-      const conseguido = estado.recolectados.includes(n);
-      const actual = objetivo === n;
-      const boton = document.createElement('button');
-      boton.type = 'button';
-      boton.className = 'fisico__numero';
-      boton.dataset.numero = String(n);
-      if (conseguido) boton.classList.add('is-conseguido');
-      if (actual) boton.classList.add('is-actual');
-      boton.disabled = !esperando;
-
-      let etiqueta = 'Número ' + n;
-      if (conseguido) etiqueta += ', pergamino ya conseguido';
-      if (actual) etiqueta += ', escalón actual';
-      if (!conseguido && !actual) etiqueta += ', toca si te salió en el dado físico';
-      boton.setAttribute('aria-label', etiqueta);
-
-      const cara = document.createElement('span');
-      cara.className = 'fisico__cara';
-      cara.textContent = String(n);
-
-      const check = document.createElement('span');
-      check.className = 'fisico__check';
-      check.setAttribute('aria-hidden', 'true');
-      check.innerHTML = '<svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>';
-
-      boton.append(cara, check);
-      fragmento.appendChild(boton);
-    }
-
-    el.fisicoNumeros.replaceChildren(fragmento);
-  }
-
-  function elegirNumeroFisico(n) {
-    if (estado.modoJuego !== 'fisico' || estado.fase !== 'tirar' || !esEscalon(n)) return;
-
-    if (estado.recolectados.includes(n)) {
-      reproducir('error');
-      const frase = aplicarPlantilla(DATA.guia.fisicoRepetido, n);
-      fijarGuia(frase);
-      abrirBurbujaGuia();
-      hablar(frase);
-      return;
-    }
-
-    const ronda = Math.min(estado.recolectados.length, ETAPAS - 1);
-    const indice = estado.cola.indexOf(n);
-    estado.ronda = ronda;
-    if (indice !== -1 && indice !== ronda) {
-      const cambio = estado.cola[ronda];
-      estado.cola[ronda] = n;
-      estado.cola[indice] = cambio;
-    } else if (indice === -1) {
-      estado.cola[ronda] = n;
-    }
-
-    estado.fase = 'buscar';
-    estado.pendiente = null;
-    seleccion = null;
-    guardar();
-    renderJuego();
-    reproducir('dado');
-    vibrar([25, 40, 25]);
-
-    const frase = aplicarPlantilla(DATA.guia.fisicoResultado, n);
-    anunciar(frase);
-    decirGuia(frase);
-    window.setTimeout(() => {
-      el.panelObjetivo.scrollIntoView({
-        behavior: REDUCIDO ? 'auto' : 'smooth',
-        block: 'center'
-      });
-    }, 90);
-    window.setTimeout(plegarBurbujaSiEstorba, 520);
   }
 
   let paradasCreadas = false;
@@ -893,7 +817,6 @@
   }
 
   function lanzarDado() {
-    if (estado.modoJuego === 'fisico') return;
     if (lanzando || estado.fase !== 'tirar') return;
     const n = estado.cola[estado.ronda];
     if (!esEscalon(n)) return;
@@ -1249,9 +1172,7 @@
     const mensaje =
       estado.fase === 'armar'
         ? 'Pergamino ' + n + ' guardado. Reuniste los nueve: ahora arma el rompecabezas.'
-        : estado.modoJuego === 'fisico'
-          ? 'Pergamino ' + n + ' guardado. Toca el número que salió en tu dado físico.'
-          : 'Pergamino ' + n + ' guardado. Ya puedes lanzar el dado otra vez.';
+        : 'Pergamino ' + n + ' guardado. Ya puedes lanzar el dado otra vez.';
 
     anunciar(mensaje);
     toast(mensaje, 'exito');
@@ -1912,14 +1833,18 @@
       return;
     }
 
+    const urlFisico = window.location.origin + '/?modo=fisico';
+
     try {
       el.qrMaestro.innerHTML = crearQR(url);
+      if (el.qrFisico) el.qrFisico.innerHTML = crearQR(urlFisico);
     } catch (error) {
       estadoAdmin('La dirección del QR maestro no es válida. Revísala.', true);
       return;
     }
 
     el.qrMaestroUrl.textContent = url;
+    if (el.qrFisicoUrl) el.qrFisicoUrl.textContent = urlFisico;
 
     el.qrGrid.innerHTML = Array.from({ length: ETAPAS }, (_, indice) => {
       const n = indice + 1;
@@ -1935,7 +1860,7 @@
     }).join('');
 
     adminGenerado = true;
-    estadoAdmin('Listo: el QR maestro y los nueve códigos de escalón.');
+    estadoAdmin('Listo: el QR maestro, el QR del juego físico y los nueve códigos de escalón.');
   }
 
   function estadoAdmin(mensaje, esError) {
@@ -1958,11 +1883,8 @@
     el.btnModalDigital.addEventListener('click', () => elegirModo('digital'));
     el.btnModalFisico.addEventListener('click', () => elegirModo('fisico'));
 
-    el.fisicoNumeros.addEventListener('click', (evento) => {
-      const boton = evento.target.closest('[data-numero]');
-      if (!boton) return;
-      elegirNumeroFisico(Number(boton.dataset.numero));
-    });
+    if (el.btnOirFisico) el.btnOirFisico.addEventListener('click', leerInstruccionesFisicas);
+    if (el.btnVolverFisico) el.btnVolverFisico.addEventListener('click', volverDelFisico);
 
     el.btnContinuar.addEventListener('click', () => {
       if (estado.terminado) {
@@ -2030,7 +1952,7 @@
     el.btnVictoriaFinal.addEventListener('click', abrirVictoria);
     el.btnOtraVez.addEventListener('click', () => {
       cerrarModal('victoria');
-      iniciarPartida(estado.modoJuego);
+      iniciarPartida();
     });
     el.btnVerPergaminos.addEventListener('click', () => {
       cerrarModal('victoria');
@@ -2134,9 +2056,10 @@
     render();
 
     if (ES_ADMIN) mostrarVista('admin');
+    else if (MODO_FISICO_URL) mostrarVista('fisico');
     else mostrarVista('inicio');
 
-    if (!ES_ADMIN && !estado.iniciado) {
+    if (!ES_ADMIN && !MODO_FISICO_URL && !estado.iniciado) {
       abrirModalModo();
       window.setTimeout(() => {
         if (estado.iniciado || document.hidden || modalActivo) return;

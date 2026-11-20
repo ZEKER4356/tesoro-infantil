@@ -217,13 +217,13 @@
               </span>
             </button>
             <button class="modo-btn modo-btn--fisico" type="button" id="btn-modo-fisico"
-                    aria-label="Modo Físico: juega con el dado real del museo">
+                    aria-label="Modo Físico: lee las instrucciones y reglas del juego de mesa">
               <span class="modo-btn__icono" aria-hidden="true">
                 <svg class="icono" aria-hidden="true"><use href="#i-museum"/></svg>
               </span>
               <span class="modo-btn__texto">
                 <span class="modo-btn__nombre">Modo Físico</span>
-                <span class="modo-btn__detalle">Juega con el dado real del museo</span>
+                <span class="modo-btn__detalle">Instrucciones y reglas del juego de mesa</span>
               </span>
             </button>
           </div>
@@ -253,6 +253,47 @@
       </footer>
     </section>
 
+    <!-- MODO FÍSICO: INSTRUCCIONES -->
+    <section class="vista vista--fisico" id="vista-fisico" data-vista="fisico" aria-labelledby="titulo-fisico" hidden>
+      <div class="pergamino-fisico">
+        <p class="pergamino-fisico__marca">La Búsqueda del Museo</p>
+        <h2 class="pergamino-fisico__titulo" id="titulo-fisico">Instrucciones del Juego Físico</h2>
+
+        <button class="btn btn--primario pergamino-fisico__oir" type="button" id="btn-oir-fisico">
+          <svg class="icono" aria-hidden="true"><use href="#i-sonido"/></svg>
+          Escuchar las instrucciones
+        </button>
+
+        <section class="pergamino-fisico__bloque" aria-labelledby="fisico-como">
+          <h3 id="fisico-como">¿Cómo se juega?</h3>
+          <ol class="pergamino-fisico__lista">
+            <li>El adulto a cargo de los niños escanea el código QR para ver las instrucciones.</li>
+            <li>Ordena el rompecabezas en cada escalón.</li>
+            <li>Comienzan todos en la casilla de salida.</li>
+            <li>Por turnos lanzan el dado.</li>
+            <li>Avanzan el número de casillas que indica el dado.</li>
+            <li>Cuando hay una pieza la levantan y leen el dato histórico (con ayuda de un adulto si es necesario).</li>
+            <li>El juego termina cuando se han conseguido todas las piezas y se completa el rompecabezas.</li>
+          </ol>
+        </section>
+
+        <section class="pergamino-fisico__bloque" aria-labelledby="fisico-reglas">
+          <h3 id="fisico-reglas">Reglas generales</h3>
+          <ol class="pergamino-fisico__lista">
+            <li>Respetar los turnos.</li>
+            <li>Cuidar los materiales.</li>
+            <li>Escuchar las instrucciones.</li>
+            <li>No correr ni empujar.</li>
+            <li>Ninguno de los participantes podrá subir o bajar escaleras sin que esté acompañado de un adulto.</li>
+          </ol>
+        </section>
+
+        <footer class="pergamino-fisico__pie">
+          <button class="btn-fantasma" type="button" id="btn-volver-fisico">Volver al inicio</button>
+        </footer>
+      </div>
+    </section>
+
     <!-- JUEGO -->
     <section class="vista" id="vista-juego" data-vista="juego" aria-labelledby="titulo-juego" hidden>
       <header class="barra">
@@ -277,13 +318,6 @@
           </div>
         </div>
         <button class="btn btn--primario btn--grande" type="button" id="btn-lanzar">Lanzar el dado</button>
-      </div>
-
-      <div class="panel panel--fisico" id="panel-fisico" hidden>
-        <p class="panel__titulo">Dado físico del museo</p>
-        <p class="fisico__instruccion" id="fisico-instruccion">¡Lanza el dado físico! Luego toca aquí el número que te salió.</p>
-        <div class="fisico__numeros" id="fisico-numeros" role="group"
-             aria-label="Elige el número que salió en el dado físico"></div>
       </div>
 
       <div class="panel panel--objetivo" id="panel-objetivo" hidden>
@@ -359,7 +393,7 @@
       <div class="admin__controles">
         <label class="admin__label" for="admin-url">Dirección del QR maestro</label>
         <input class="admin__input" id="admin-url" type="url" inputmode="url" spellcheck="false" autocomplete="off">
-        <p class="ayuda">Escribe la dirección pública del juego. Ese QR abrirá la pantalla de inicio.</p>
+        <p class="ayuda">Escribe la dirección pública del juego. Ese QR abrirá la pantalla de inicio; el QR del juego físico abrirá solo las instrucciones.</p>
         <div class="admin__botones">
           <button class="btn btn--primario" type="button" id="btn-generar">
             <svg class="icono" aria-hidden="true"><use href="#i-refresh"/></svg>
@@ -384,6 +418,13 @@
           <div class="qr-tarjeta__codigo" id="qr-maestro"></div>
           <p class="qr-tarjeta__texto">Escanea aquí para empezar</p>
           <p class="qr-tarjeta__url" id="qr-maestro-url"></p>
+        </article>
+
+        <article class="qr-tarjeta qr-tarjeta--fisico">
+          <p class="qr-tarjeta__etiqueta">Juego físico</p>
+          <div class="qr-tarjeta__codigo" id="qr-fisico"></div>
+          <p class="qr-tarjeta__texto">QR Juego Físico (Solo Instrucciones)</p>
+          <p class="qr-tarjeta__url" id="qr-fisico-url"></p>
         </article>
 
         <div class="qr-grid" id="qr-grid"></div>
@@ -461,7 +502,7 @@
     <div class="modal__caja modal__caja--modo" role="dialog" aria-modal="true" aria-labelledby="modo-titulo">
       <p class="modo-modal__marca">Museo</p>
       <h2 class="modo-modal__titulo" id="modo-titulo">¿Cómo vas a jugar hoy?</h2>
-      <p class="modo-modal__texto">Elige con qué dado quieres empezar la búsqueda.</p>
+      <p class="modo-modal__texto">Elige cómo quieres jugar.</p>
 
       <div class="modo-opciones modo-opciones--modal">
         <button class="modo-btn modo-btn--digital modo-btn--grande" type="button" id="btn-modal-digital"
@@ -475,13 +516,13 @@
           </span>
         </button>
         <button class="modo-btn modo-btn--fisico modo-btn--grande" type="button" id="btn-modal-fisico"
-                aria-label="Modo Físico: juega con el dado real del museo">
+                aria-label="Modo Físico: lee las instrucciones y reglas del juego de mesa">
           <span class="modo-btn__icono" aria-hidden="true">
             <svg class="icono" aria-hidden="true"><use href="#i-museum"/></svg>
           </span>
           <span class="modo-btn__texto">
             <span class="modo-btn__nombre">Modo Físico</span>
-            <span class="modo-btn__detalle">Juega con el dado real del museo</span>
+            <span class="modo-btn__detalle">Instrucciones y reglas del juego de mesa</span>
           </span>
         </button>
       </div>

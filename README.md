@@ -80,26 +80,24 @@ El título de la aventura y el mensaje final también están en `js/data.js`.
 
 Al entrar sin una partida guardada (o después de reiniciar) aparece un modal
 bloqueante que pregunta **«¿Cómo vas a jugar hoy?»**. La elección se puede cambiar
-después desde la pantalla inicial; si ya hay una partida, se pide confirmación antes
-de borrarla.
+después desde la pantalla inicial.
 
 - **Modo Digital**: usa el dado virtual de nueve caras, que recorre los escalones
   sin repetir. Es el flujo original, sin cambios.
-- **Modo Físico**: el niño lanza el dado real del museo y toca en pantalla el número
-  que le salió. Los números ya conseguidos muestran un ✓ verde; si repite, San Juan
-  le recuerda esperar el siguiente turno. Al elegir un número nuevo se habilita el
-  escaneo de ese escalón.
+- **Modo Físico**: muestra únicamente un pergamino con las instrucciones y las reglas
+  del juego de mesa. No tiene dado, escáner, inventario ni tablero, y nunca modifica
+  la partida digital guardada. San Juan puede leer las instrucciones en voz alta.
 
-La elección se guarda en `localStorage` (clave `museo_v1`) como
-`modoJuego: 'digital' | 'fisico'`. Las partidas guardadas antiguas se abren en Modo
-Digital.
+El Modo Físico también se abre directamente con `?modo=fisico`, pensado para un QR
+exclusivo de instrucciones. Las partidas guardadas no usan `modoJuego`: cualquier
+partida antigua que lo incluya se abre como Modo Digital.
 
 ## Voz y guía
 
 San Juan Nepomuceno acompaña la partida con un globo de diálogo y voz. La voz usa la
 Web Speech API del propio dispositivo (`speechSynthesis`), sin servicios externos ni
-archivos de audio. Prefiere una voz en español de Colombia, Latinoamérica o España, en
-ese orden.
+archivos de audio. Prefiere una voz masculina en español de Colombia, Latinoamérica o
+España, en ese orden, con tono grave y volumen máximo.
 
 El guía vive en un botón flotante fijo, visible en todas las vistas del juego. Su
 diálogo cambia según el apartado y el momento: inicio, dado, resultado del dado,
@@ -134,7 +132,8 @@ dependen del sistema.
 
 Abre `https://tu-sitio/?admin=1`. Escribe la dirección pública del juego en el campo
 del QR maestro y pulsa **Generar los QRs**. El botón **Imprimir** produce una hoja A4
-con el QR de entrada y los nueve códigos de escalón, listos para recortar.
+con el QR de entrada, el QR del juego físico (solo instrucciones) y los nueve códigos
+de escalón, listos para recortar.
 
 Los códigos de escalón son texto plano (`MUSEO_ESCALON_1` a `MUSEO_ESCALON_9`): se
 leen dentro del juego, no con la cámara del sistema. El QR maestro sí es una URL y
