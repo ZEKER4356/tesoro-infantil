@@ -27,6 +27,8 @@
     guiaBurbuja: $('#guia-burbuja'),
     guiaTexto: $('#guia-texto'),
     btnAvatarGuia: $('#btn-avatar-guia'),
+    btnPausarGuia: $('#btn-pausar-guia'),
+    btnDetenerGuia: $('#btn-detener-guia'),
     btnOirPergamino: $('#btn-oir-pergamino'),
     btnOirVictoria: $('#btn-oir-victoria'),
     btnOirFisico: $('#btn-oir-fisico'),
@@ -310,7 +312,6 @@
     render();
     mostrarVista('juego');
     toast('Tu recorrido está listo. Lanza el dado.', 'exito');
-    decirGuia(DATA.guia.dado);
   }
 
   let motivoConfirmacion = 'reiniciar';
@@ -374,7 +375,7 @@
 
   function leerInstruccionesFisicas() {
     fijarGuia(DATA.guia.fisicoVista);
-    hablar(DATA.guia.fisicoInstrucciones, { forzar: true });
+    hablarAvatar(DATA.guia.fisicoInstrucciones, { forzar: true });
   }
 
   function reiniciarTotal() {
@@ -486,7 +487,7 @@
   function decirGuia(texto) {
     fijarGuia(texto);
     if (!modalActivo) plegarBurbujaSiEstorba();
-    hablar(texto);
+    hablarAvatar(texto);
   }
 
   function alternarBurbuja() {
@@ -537,7 +538,7 @@
     if (el.btnAvatarGuia) el.btnAvatarGuia.setAttribute('aria-expanded', 'false');
   }
 
-  function mostrarVista(nombre) {
+  function mostrarVista(nombre, opciones) {
     if (!VISTAS.includes(nombre)) nombre = 'inicio';
     VISTAS.forEach((vista) => {
       const seccion = document.getElementById('vista-' + vista);
@@ -569,6 +570,15 @@
       el.guiaBurbuja.hidden = false;
       if (el.btnAvatarGuia) el.btnAvatarGuia.setAttribute('aria-expanded', 'true');
       plegarBurbujaSiEstorba();
+    }
+
+    /* Cada cambio de vista dispara la locución de San Juan sin esperar al botón. */
+    if (!opciones || !opciones.silenciar) {
+      if (nombre === 'fisico') leerInstruccionesFisicas();
+      else if (nombre !== 'admin') {
+        const texto = textoGuiaVista(nombre);
+        if (texto) hablarAvatar(texto);
+      }
     }
 
     window.scrollTo({ top: 0, behavior: REDUCIDO ? 'auto' : 'smooth' });
@@ -1078,7 +1088,7 @@
     const objetivo = objetivoActual();
     const voz = esCodigo && objetivo ? aplicarPlantilla(DATA.guia.escanerError, objetivo) : mensaje;
     fijarGuia(voz);
-    hablar(voz, { avisar: true });
+    hablarAvatar(voz, { avisar: true });
   }
 
   function limpiarErrorEscaner() {
@@ -1442,7 +1452,7 @@
     if (estado.sonido) {
       reproducir('camara');
       const texto = el.guiaTexto ? el.guiaTexto.textContent : '';
-      if (texto) hablar(texto);
+      if (texto) hablarAvatar(texto);
     } else {
       detenerVoz();
     }
@@ -1451,13 +1461,39 @@
 
   /* ---------- Voz y guía ---------- */
 
-  const ORDEN_VOZ = ['es-co', 'es-419', 'es-mx', 'es-us', 'es-es'];
-  const VOCES_MASCULINAS = ['jorge', 'pablo', 'raul', 'alvaro', 'diego', 'carlos', 'juan', 'google espanol'];
-  const VOCES_FEMENINAS = ['helena', 'sabina', 'paulina', 'monica', 'laura', 'sofia'];
+  const ORDEN_VOZ = ['es-co', 'es-419', 'es-mx', 'es-us', 'es-ar', 'es-es'];
+  const VOCES_MASCULINAS = [
+    'jorge',
+    'pablo',
+    'raul',
+    'alvaro',
+    'diego',
+    'carlos',
+    'juan',
+    'enrique',
+    'andres',
+    'male',
+    'hombre'
+  ];
+  const VOCES_FEMENINAS = [
+    'helena',
+    'sabina',
+    'paulina',
+    'monica',
+    'laura',
+    'sofia',
+    'elena',
+    'conchita',
+    'luciana',
+    'female',
+    'mujer'
+  ];
   let vozElegida = null;
   let vozToken = 0;
   let vozTemporizador = null;
   let vozEspera = null;
+  let vozEstado = 'inactivo';
+  let vozTexto = '';
 
   function vozDisponible() {
     return 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function';
@@ -1470,11 +1506,16 @@
       .replace(/[\u0300-\u036f]/g, '');
   }
 
-  function puntajeVoz(voz) {
+  function esVozMasculina(voz) {
     const nombre = normalizarNombreVoz(voz);
+    if (VOCES_FEMENINAS.some((clave) => nombre.includes(clave))) return false;
+    return VOCES_MASCULINAS.some((clave) => nombre.includes(clave));
+  }
+
+  function puntajeVoz(voz) {
     const lang = String(voz.lang || '').toLowerCase();
     let puntos = 0;
-    if (VOCES_MASCULINAS.some((clave) => nombre.includes(clave))) puntos += 100;
+    if (esVozMasculina(voz)) puntos += 100;
     const posicion = ORDEN_VOZ.findIndex((codigo) => lang.startsWith(codigo));
     if (posicion !== -1) puntos += (ORDEN_VOZ.length - posicion) * 10;
     else if (lang.startsWith('es')) puntos += 5;
@@ -1488,9 +1529,7 @@
     if (!lista.length) return;
 
     const espanolas = lista.filter((voz) => /^es/i.test(String(voz.lang || '')));
-    const masculinas = espanolas.filter(
-      (voz) => !VOCES_FEMENINAS.some((clave) => normalizarNombreVoz(voz).includes(clave))
-    );
+    const masculinas = espanolas.filter((voz) => esVozMasculina(voz));
 
     /* Se prioriza una voz masculina en español; si no existe, se usa la primera en español. */
     const candidatas = masculinas.length ? masculinas : espanolas.length ? espanolas : lista;
@@ -1509,6 +1548,43 @@
   if (vozDisponible()) {
     cargarVoces();
     window.speechSynthesis.onvoiceschanged = cargarVoces;
+    if (typeof window.speechSynthesis.addEventListener === 'function') {
+      window.speechSynthesis.addEventListener('voiceschanged', cargarVoces);
+    }
+    /* En móviles la lista de voces tarda en llegar: se reintenta sin bloquear. */
+    [350, 1200, 3000].forEach((ms) => window.setTimeout(cargarVoces, ms));
+  }
+
+  function limpiarTemporizadoresVoz() {
+    if (vozTemporizador) {
+      window.clearTimeout(vozTemporizador);
+      vozTemporizador = null;
+    }
+    if (vozEspera) {
+      window.clearTimeout(vozEspera);
+      vozEspera = null;
+    }
+  }
+
+  function actualizarControlesVoz() {
+    if (!el.btnPausarGuia) return;
+    const hablando = vozEstado === 'hablando';
+    const pausado = vozEstado === 'pausado';
+    const etiqueta = hablando
+      ? 'Pausar la lectura'
+      : pausado
+        ? 'Reanudar la lectura'
+        : 'Escuchar de nuevo';
+    el.btnPausarGuia.setAttribute('aria-label', etiqueta);
+    el.btnPausarGuia.setAttribute('title', etiqueta);
+    el.btnPausarGuia.setAttribute('aria-pressed', String(pausado));
+    el.btnPausarGuia.classList.toggle('is-pausado', pausado);
+    el.btnPausarGuia.classList.toggle('is-apagado', vozEstado === 'inactivo');
+    const uso = $('use', el.btnPausarGuia);
+    if (uso) uso.setAttribute('href', hablando ? '#i-pausa' : '#i-play');
+    if (el.btnDetenerGuia) {
+      el.btnDetenerGuia.classList.toggle('is-apagado', vozEstado === 'inactivo');
+    }
   }
 
   function detenerVoz() {
@@ -1520,15 +1596,75 @@
         /* sin voz disponible */
       }
     }
-    if (vozTemporizador) {
-      window.clearTimeout(vozTemporizador);
-      vozTemporizador = null;
-    }
-    if (vozEspera) {
-      window.clearTimeout(vozEspera);
-      vozEspera = null;
-    }
+    limpiarTemporizadoresVoz();
+    vozEstado = 'inactivo';
     if (el.avatar) el.avatar.classList.remove('is-hablando');
+    actualizarControlesVoz();
+  }
+
+  function pausarVoz() {
+    if (!vozDisponible()) return;
+    const sintesis = window.speechSynthesis;
+    if (!sintesis.speaking && !sintesis.pending) {
+      if (vozTexto) repetirTexto(vozTexto);
+      return;
+    }
+    try {
+      sintesis.pause();
+    } catch (error) {
+      /* sin pausa nativa */
+    }
+    /* En Android pause() a veces no hace nada: se corta y queda listo para repetir. */
+    if (!sintesis.paused) {
+      try {
+        sintesis.cancel();
+      } catch (error) {
+        /* sin voz disponible */
+      }
+      vozToken += 1;
+      vozEstado = 'inactivo';
+    } else {
+      vozEstado = 'pausado';
+    }
+    limpiarTemporizadoresVoz();
+    if (el.avatar) el.avatar.classList.remove('is-hablando');
+    actualizarControlesVoz();
+  }
+
+  function reanudarVoz() {
+    if (!vozDisponible()) return;
+    const sintesis = window.speechSynthesis;
+    if (sintesis.paused) {
+      try {
+        sintesis.resume();
+      } catch (error) {
+        /* sin pausa nativa */
+      }
+      if (sintesis.paused) {
+        /* Algunos Android no reanudan: se vuelve a leer desde el principio. */
+        if (vozTexto) repetirTexto(vozTexto);
+        return;
+      }
+      vozEstado = 'hablando';
+      if (el.avatar) el.avatar.classList.add('is-hablando');
+      actualizarControlesVoz();
+      return;
+    }
+    const texto = vozTexto || (el.guiaTexto ? el.guiaTexto.textContent : '');
+    if (texto) repetirTexto(texto);
+  }
+
+  function alternarPausaVoz() {
+    if (vozEstado === 'pausado') {
+      reanudarVoz();
+      return;
+    }
+    if (vozEstado === 'hablando') {
+      pausarVoz();
+      return;
+    }
+    const texto = vozTexto || (el.guiaTexto ? el.guiaTexto.textContent : '');
+    if (texto) repetirTexto(texto);
   }
 
   // Frases cortas: algunos navegadores cortan la voz en textos muy largos.
@@ -1577,16 +1713,25 @@
     }
     if (!vozDisponible()) return;
     try {
+      cargarVoces();
       window.speechSynthesis.getVoices();
       if (!window.speechSynthesis.speaking && !window.speechSynthesis.pending) {
         const silencio = new window.SpeechSynthesisUtterance(' ');
         silencio.volume = 0.01;
         silencio.rate = 1;
+        if (vozElegida) silencio.lang = vozElegida.lang;
         window.speechSynthesis.speak(silencio);
       }
     } catch (error) {
       /* sin voz disponible */
     }
+  }
+
+  function hablarAvatar(texto, opciones) {
+    const limpio = String(texto || '').replace(/\s+/g, ' ').trim();
+    if (!limpio) return;
+    vozTexto = limpio;
+    hablar(limpio, opciones);
   }
 
   function hablar(texto, opciones) {
@@ -1600,25 +1745,28 @@
     }
     if (!estado.sonido && !ajustes.forzar) return;
 
+    vozTexto = limpio;
     vozToken += 1;
     const token = vozToken;
 
     try {
-      if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
-        window.speechSynthesis.cancel();
-      }
+      /* Nunca se enciman dos frases ni suenan audios anteriores. */
+      $$('audio').forEach((audio) => {
+        try {
+          audio.pause();
+        } catch (error) {
+          /* sin audio que pausar */
+        }
+      });
+      window.speechSynthesis.cancel();
 
       const terminar = () => {
         if (token !== vozToken) return;
+        if (vozEstado === 'pausado') return;
         if (el.avatar) el.avatar.classList.remove('is-hablando');
-        if (vozTemporizador) {
-          window.clearTimeout(vozTemporizador);
-          vozTemporizador = null;
-        }
-        if (vozEspera) {
-          window.clearTimeout(vozEspera);
-          vozEspera = null;
-        }
+        vozEstado = 'inactivo';
+        limpiarTemporizadoresVoz();
+        actualizarControlesVoz();
       };
 
       const arrancar = () => {
@@ -1626,7 +1774,10 @@
           window.clearTimeout(vozEspera);
           vozEspera = null;
         }
-        if (token === vozToken && el.avatar) el.avatar.classList.add('is-hablando');
+        if (token !== vozToken) return;
+        vozEstado = 'hablando';
+        if (el.avatar) el.avatar.classList.add('is-hablando');
+        actualizarControlesVoz();
       };
 
       const trozos = trocearVoz(limpio);
@@ -1639,8 +1790,8 @@
           frase.lang = 'es-CO';
         }
         frase.rate = 0.95;
-        frase.pitch = 0.85;
-        frase.volume = 1;
+        frase.pitch = 0.80;
+        frase.volume = 1.0;
         frase.onstart = arrancar;
 
         if (indice === trozos.length - 1) {
@@ -1650,7 +1801,9 @@
         return frase;
       });
 
+      vozEstado = 'hablando';
       if (el.avatar) el.avatar.classList.add('is-hablando');
+      actualizarControlesVoz();
       if (vozTemporizador) window.clearTimeout(vozTemporizador);
       vozTemporizador = window.setTimeout(terminar, Math.min(60000, Math.max(3000, limpio.length * 110)));
 
@@ -1660,12 +1813,17 @@
           window.clearTimeout(vozEspera);
           vozEspera = null;
         }
-        if (token === vozToken && el.avatar) el.avatar.classList.remove('is-hablando');
+        if (token !== vozToken || vozEstado === 'pausado') return;
+        vozEstado = 'inactivo';
+        if (el.avatar) el.avatar.classList.remove('is-hablando');
+        actualizarControlesVoz();
       }, 1300);
 
       frases.forEach((frase) => window.speechSynthesis.speak(frase));
     } catch (error) {
       if (el.avatar) el.avatar.classList.remove('is-hablando');
+      vozEstado = 'inactivo';
+      actualizarControlesVoz();
     }
   }
 
@@ -1686,7 +1844,7 @@
       sincronizarSonido();
       toast('Sonidos activados.');
     }
-    hablar(limpio, { forzar: true });
+    hablarAvatar(limpio, { forzar: true });
   }
 
   function repetirPergamino() {
@@ -1886,6 +2044,16 @@
     if (el.btnOirFisico) el.btnOirFisico.addEventListener('click', leerInstruccionesFisicas);
     if (el.btnVolverFisico) el.btnVolverFisico.addEventListener('click', volverDelFisico);
 
+    if (el.btnPausarGuia) el.btnPausarGuia.addEventListener('click', alternarPausaVoz);
+    if (el.btnDetenerGuia) el.btnDetenerGuia.addEventListener('click', detenerVoz);
+
+    /* El primer toque en cualquier parte desbloquea la voz automática del móvil. */
+    document.addEventListener('pointerdown', desbloquearAudio, {
+      once: true,
+      capture: true,
+      passive: true
+    });
+
     el.btnContinuar.addEventListener('click', () => {
       if (estado.terminado) {
         mostrarVista('tablero');
@@ -2055,16 +2223,12 @@
     conectarEventos();
     render();
 
-    if (ES_ADMIN) mostrarVista('admin');
+    if (ES_ADMIN) mostrarVista('admin', { silenciar: true });
     else if (MODO_FISICO_URL) mostrarVista('fisico');
-    else mostrarVista('inicio');
+    else mostrarVista('inicio', { silenciar: true });
 
     if (!ES_ADMIN && !MODO_FISICO_URL && !estado.iniciado) {
       abrirModalModo();
-      window.setTimeout(() => {
-        if (estado.iniciado || document.hidden || modalActivo) return;
-        hablar(DATA.guia.bienvenida);
-      }, 900);
     }
 
     if (!almacenOk) {

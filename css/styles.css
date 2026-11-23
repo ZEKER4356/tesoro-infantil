@@ -445,6 +445,17 @@ body.modal-abierto .guia-flotante .guia-flotante__btn .avatar-contenedor {
   gap: 8px;
 }
 
+.guia-flotante__acciones {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.guia-flotante__control.is-apagado {
+  opacity: .5;
+}
+
 .guia-flotante__oir {
   display: grid;
   place-items: center;
