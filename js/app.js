@@ -84,6 +84,7 @@
     pergaminoDato: $('#pergamino-dato'),
     pergaminoPrueba: $('#pergamino-prueba'),
     pergaminoReverso: $('.pergamino'),
+    pergaminoImagen: $('#pergamino-imagen'),
     flip: $('#pergamino-flip'),
     btnGirar: $('#btn-girar'),
     btnGuardar: $('#btn-guardar'),
@@ -91,6 +92,7 @@
 
     victoriaMensaje: $('#victoria-mensaje'),
     victoriaResumen: $('#victoria-resumen'),
+    victoriaImagen: $('#victoria-imagen'),
     confeti: $('#confeti'),
     btnOtraVez: $('#btn-otra-vez'),
     btnVerPergaminos: $('#btn-ver-pergaminos'),
@@ -406,6 +408,7 @@
       rutas.push(rutaCon(DATA.rutas.frente, n));
       rutas.push(rutaCon(DATA.rutas.espalda, n));
     }
+    if (DATA.rutas.completo) rutas.push(DATA.rutas.completo);
     return Promise.all(
       rutas.map(
         (ruta) =>
@@ -419,7 +422,7 @@
     ).then((resultados) => {
       imagenesOk = resultados.every(Boolean);
       if (!imagenesOk) {
-        toast('Faltan imágenes en assets. Mientras tanto se muestran los diseños de prueba.', 'error');
+        toast('Faltan imágenes en la carpeta fichas. Mientras tanto se muestran los diseños de prueba.', 'error');
         render();
       }
     });
@@ -716,9 +719,9 @@
   function htmlPieza(id) {
     if (usarReal()) {
       return (
-        '<span class="pieza pieza--real" style="background-image:url(\'' +
-        rutaCon(DATA.rutas.frente, id) +
-        '\')" aria-hidden="true"></span>'
+        '<span class="pieza pieza--real" aria-hidden="true">' +
+        '<img class="pieza__img" src="' + rutaCon(DATA.rutas.frente, id) + '" alt="" loading="lazy" decoding="async">' +
+        '</span>'
       );
     }
     const col = (id - 1) % 3;
@@ -748,6 +751,7 @@
       const clases = ['casilla'];
       if (pieza) clases.push('is-ocupada');
       if (fijada) clases.push('is-fijada');
+      if (usarReal()) clases.push('is-real');
 
       let etiqueta = 'Casilla ' + (slot + 1) + ': vacía';
       if (pieza) {
@@ -769,7 +773,7 @@
     el.inventario.innerHTML = disponibles
       .map(
         (id) =>
-          '<button type="button" class="pieza-boton' + (seleccion === id ? ' is-elegida' : '') + '" data-pieza="' + id +
+          '<button type="button" class="pieza-boton' + (usarReal() ? ' pieza-boton--real' : '') + (seleccion === id ? ' is-elegida' : '') + '" data-pieza="' + id +
           '" aria-pressed="' + (seleccion === id) + '" aria-label="Pieza ' + id + '"><span class="pieza-boton__visual">' +
           htmlPieza(id) + '</span></button>'
       )
@@ -796,7 +800,7 @@
     for (let id = 1; id <= ETAPAS; id += 1) {
       if (estado.recolectados.includes(id)) {
         fichas.push(
-          '<button type="button" class="coleccion__item" data-pergamino="' + id + '" aria-label="Abrir el pergamino del escalón ' + id + '">' +
+          '<button type="button" class="coleccion__item' + (usarReal() ? ' coleccion__item--real' : '') + '" data-pergamino="' + id + '" aria-label="Abrir el pergamino del escalón ' + id + '">' +
           '<span class="coleccion__visual">' + htmlPieza(id) + '</span>' +
           '<span class="marca-ok"><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg></span>' +
           '<span class="coleccion__nombre">Escalón ' + id + '</span>' +
@@ -1112,17 +1116,19 @@
     el.pergaminoPrueba.hidden = !datos.esPlaceholder;
     el.pergaminoPrueba.textContent = DATA.etiquetaPlaceholder;
     el.pergaminoVisual.innerHTML = htmlPieza(id);
+    el.pergaminoVisual.classList.toggle('is-real', usarReal());
 
     if (el.pergaminoReverso) {
-      if (usarReal()) {
-        el.pergaminoReverso.style.setProperty(
-          '--espalda',
-          "url('" + rutaCon(DATA.rutas.espalda, id) + "')"
-        );
-        el.pergaminoReverso.classList.add('pergamino--real');
-      } else {
-        el.pergaminoReverso.style.removeProperty('--espalda');
-        el.pergaminoReverso.classList.remove('pergamino--real');
+      const real = usarReal();
+      el.pergaminoReverso.classList.toggle('pergamino--real', real);
+      if (el.pergaminoImagen) {
+        if (real) {
+          el.pergaminoImagen.src = rutaCon(DATA.rutas.espalda, id);
+          el.pergaminoImagen.hidden = false;
+        } else {
+          el.pergaminoImagen.removeAttribute('src');
+          el.pergaminoImagen.hidden = true;
+        }
       }
     }
 
@@ -1283,6 +1289,17 @@
   function abrirVictoria() {
     el.victoriaMensaje.textContent = DATA.mensajeFinal;
     el.victoriaResumen.textContent = ETAPAS + ' escalones, ' + ETAPAS + ' pergaminos y el museo completo.';
+
+    if (el.victoriaImagen) {
+      if (usarReal() && DATA.rutas.completo) {
+        el.victoriaImagen.src = DATA.rutas.completo;
+        el.victoriaImagen.hidden = false;
+      } else {
+        el.victoriaImagen.removeAttribute('src');
+        el.victoriaImagen.hidden = true;
+      }
+    }
+
     abrirModal('victoria', {
       alCerrar: () => actualizarGuia(vistaActual)
     });

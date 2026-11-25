@@ -1,12 +1,13 @@
 /* Contenido editable de La Búsqueda del Museo.
-   Para pasar a las fotos reales, cambia usarImagenesReales a true y guarda
-   los archivos en assets/frente y assets/espalda con los nombres indicados.
-   No hace falta tocar js/app.js. */
+   Las fotos reales viven en la carpeta fichas/. Los PNG originales tenían
+   fondo blanco, así que se usan las versiones con transparencia de
+   fichas/transparentes/ (mismos nombres: ficha_{n}_frente.png,
+   ficha_{n}_espalda.png y COMPLETO.png). */
 window.MUSEO = (function () {
   'use strict';
 
   return {
-    usarImagenesReales: false,
+    usarImagenesReales: true,
 
     titulo: 'La Búsqueda del Museo',
     subtitulo: 'Nueve escalones, nueve pergaminos y un museo por descubrir.',
@@ -60,71 +61,89 @@ window.MUSEO = (function () {
     prefijoQR: 'MUSEO_ESCALON_',
     etapas: 9,
 
-    /* pieza-1.webp es la esquina superior izquierda, pieza-2 la de su derecha
-       y pieza-9 la esquina inferior derecha. El tablero usa ese mismo orden. */
+    /* ficha_1 es la esquina superior izquierda, ficha_2 la de su derecha
+       y ficha_9 la esquina inferior derecha. El tablero usa ese mismo orden. */
     rutas: {
-      frente: 'assets/frente/pieza-{n}.webp',
-      espalda: 'assets/espalda/espalda-{n}.webp'
+      frente: 'fichas/transparentes/ficha_{n}_frente.png',
+      espalda: 'fichas/transparentes/ficha_{n}_espalda.png',
+      completo: 'fichas/transparentes/COMPLETO.png'
     },
 
     etiquetaPlaceholder: 'Texto de prueba',
 
-    /* Los datos curiosos son contenido del museo: no se inventan.
-       Mientras esPlaceholder sea true, la app muestra la etiqueta de prueba. */
+    /* Los datos curiosos son contenido del museo y coinciden con el texto
+       impreso en la espalda de cada ficha. Se narran al girar el pergamino. */
     pergaminos: [
       {
         id: 1,
         titulo: 'Pergamino del escalón 1',
-        dato: 'Escribe aquí el dato curioso real del escalón 1. Reemplaza este texto en js/data.js.',
-        esPlaceholder: true
+        dato:
+          'El Museo de Arte abrió el 13 de diciembre de 2003. ' +
+          '¡Desde ese día las personas pueden venir a conocer sus obras de arte!',
+        esPlaceholder: false
       },
       {
         id: 2,
         titulo: 'Pergamino del escalón 2',
-        dato: 'Escribe aquí el dato curioso real del escalón 2. Reemplaza este texto en js/data.js.',
-        esPlaceholder: true
+        dato:
+          'Este lugar hace parte de la Universidad del Magdalena. ' +
+          '¡Aquí podemos conocer obras de arte y aprender historias de hace muchos años!',
+        esPlaceholder: false
       },
       {
         id: 3,
         titulo: 'Pergamino del escalón 3',
-        dato: 'Escribe aquí el dato curioso real del escalón 3. Reemplaza este texto en js/data.js.',
-        esPlaceholder: true
+        dato:
+          'En este museo hay pinturas y otras obras hechas por artistas. ' +
+          '¡Cada una puede mostrarnos algo diferente!',
+        esPlaceholder: false
       },
       {
         id: 4,
         titulo: 'Pergamino del escalón 4',
-        dato: 'Escribe aquí el dato curioso real del escalón 4. Reemplaza este texto en js/data.js.',
-        esPlaceholder: true
+        dato:
+          'En el Claustro se hacen presentaciones de música, poesía y otras actividades artísticas. ' +
+          '¡Es un lugar donde las personas pueden mostrar sus talentos!',
+        esPlaceholder: false
       },
       {
         id: 5,
         titulo: 'Pergamino del escalón 5',
-        dato: 'Escribe aquí el dato curioso real del escalón 5. Reemplaza este texto en js/data.js.',
-        esPlaceholder: true
+        dato:
+          'Este edificio también fue una escuela. ' +
+          '¡Muchas personas vinieron aquí para aprender cosas nuevas!',
+        esPlaceholder: false
       },
       {
         id: 6,
         titulo: 'Pergamino del escalón 6',
-        dato: 'Escribe aquí el dato curioso real del escalón 6. Reemplaza este texto en js/data.js.',
-        esPlaceholder: true
+        dato:
+          'Este edificio comenzó a construirse en el año 1673. ' +
+          '¡Hace muchísimos años! ¡Es más antiguo que nuestros abuelos!',
+        esPlaceholder: false
       },
       {
         id: 7,
         titulo: 'Pergamino del escalón 7',
-        dato: 'Escribe aquí el dato curioso real del escalón 7. Reemplaza este texto en js/data.js.',
-        esPlaceholder: true
+        dato:
+          'Antes este lugar era una escuela donde estudiaban las personas que querían ser sacerdotes.',
+        esPlaceholder: false
       },
       {
         id: 8,
         titulo: 'Pergamino del escalón 8',
-        dato: 'Escribe aquí el dato curioso real del escalón 8. Reemplaza este texto en js/data.js.',
-        esPlaceholder: true
+        dato:
+          'Terminaron de construir este edificio en 1811. ' +
+          '¡Imagínate cuánto tiempo necesitaron para terminarlo!',
+        esPlaceholder: false
       },
       {
         id: 9,
         titulo: 'Pergamino del escalón 9',
-        dato: 'Escribe aquí el dato curioso real del escalón 9. Reemplaza este texto en js/data.js.',
-        esPlaceholder: true
+        dato:
+          'En el año 2001 comenzaron a arreglar este edificio para que no se dañara ' +
+          'y pudiéramos seguir disfrutándolo.',
+        esPlaceholder: false
       }
     ]
   };

@@ -1,7 +1,7 @@
 /* Caché offline de La Búsqueda del Museo.
    Al publicar cambios en HTML, CSS o JS, sube el número de VERSION
    para que los teléfonos descarten la copia vieja. */
-const VERSION = 'museo-v9';
+const VERSION = 'museo-v10';
 
 const SHELL = [
   './',
@@ -10,6 +10,25 @@ const SHELL = [
   './js/data.js',
   './js/app.js',
   './manifest.webmanifest',
+  './fichas/transparentes/COMPLETO.png',
+  './fichas/transparentes/ficha_1_frente.png',
+  './fichas/transparentes/ficha_1_espalda.png',
+  './fichas/transparentes/ficha_2_frente.png',
+  './fichas/transparentes/ficha_2_espalda.png',
+  './fichas/transparentes/ficha_3_frente.png',
+  './fichas/transparentes/ficha_3_espalda.png',
+  './fichas/transparentes/ficha_4_frente.png',
+  './fichas/transparentes/ficha_4_espalda.png',
+  './fichas/transparentes/ficha_5_frente.png',
+  './fichas/transparentes/ficha_5_espalda.png',
+  './fichas/transparentes/ficha_6_frente.png',
+  './fichas/transparentes/ficha_6_espalda.png',
+  './fichas/transparentes/ficha_7_frente.png',
+  './fichas/transparentes/ficha_7_espalda.png',
+  './fichas/transparentes/ficha_8_frente.png',
+  './fichas/transparentes/ficha_8_espalda.png',
+  './fichas/transparentes/ficha_9_frente.png',
+  './fichas/transparentes/ficha_9_espalda.png',
   './assets/icons/icon.svg',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
