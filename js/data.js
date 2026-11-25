@@ -1,8 +1,8 @@
 /* Contenido editable de La Búsqueda del Museo.
    Las fotos reales viven en la carpeta fichas/. Los PNG originales tenían
    fondo blanco, así que se usan las versiones con transparencia de
-   fichas/transparentes/ (mismos nombres: ficha_{n}_frente.png,
-   ficha_{n}_espalda.png y COMPLETO.png). */
+   fichas/transparentes/, nombradas por su posición en el tablero
+   (ficha_arriba_izquierda_frente.png, ficha_medio_centro_espalda.png, etc.). */
 window.MUSEO = (function () {
   'use strict';
 
@@ -61,11 +61,38 @@ window.MUSEO = (function () {
     prefijoQR: 'MUSEO_ESCALON_',
     etapas: 9,
 
-    /* ficha_1 es la esquina superior izquierda, ficha_2 la de su derecha
-       y ficha_9 la esquina inferior derecha. El tablero usa ese mismo orden. */
+    /* Cada ficha tiene un número de escalón, pero su posición en el tablero
+       no coincide con ese número. Este mapa sale de los nombres reales de
+       los archivos de fichas/transparentes/. */
+    posiciones: {
+      1: 'abajo_derecha',
+      2: 'abajo_izquierda',
+      3: 'abajo_centro',
+      4: 'medio_centro',
+      5: 'medio_derecha',
+      6: 'arriba_derecha',
+      7: 'arriba_izquierda',
+      8: 'arriba_centro',
+      9: 'medio_izquierda'
+    },
+
+    /* Orden de las casillas del tablero 3x3, de izquierda a derecha y de
+       arriba hacia abajo. */
+    ordenTablero: [
+      'arriba_izquierda',
+      'arriba_centro',
+      'arriba_derecha',
+      'medio_izquierda',
+      'medio_centro',
+      'medio_derecha',
+      'abajo_izquierda',
+      'abajo_centro',
+      'abajo_derecha'
+    ],
+
     rutas: {
-      frente: 'fichas/transparentes/ficha_{n}_frente.png',
-      espalda: 'fichas/transparentes/ficha_{n}_espalda.png',
+      frente: 'fichas/transparentes/ficha_{posicion}_frente.png',
+      espalda: 'fichas/transparentes/ficha_{posicion}_espalda.png',
       completo: 'fichas/transparentes/COMPLETO.png'
     },
 

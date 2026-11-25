@@ -194,10 +194,12 @@
     });
 
     e.bloqueadas = unicos(obj.bloqueadas).filter(
-      (slot) => esSlot(slot) && e.colocadas[slot] === slot + 1
+      (slot) => esSlot(slot) && e.colocadas[slot] && slotDePieza(e.colocadas[slot]) === slot
     );
     for (let slot = 0; slot < ETAPAS; slot += 1) {
-      if (e.colocadas[slot] === slot + 1 && !e.bloqueadas.includes(slot)) e.bloqueadas.push(slot);
+      if (e.colocadas[slot] && slotDePieza(e.colocadas[slot]) === slot && !e.bloqueadas.includes(slot)) {
+        e.bloqueadas.push(slot);
+      }
     }
 
     if (!e.iniciado) {
@@ -393,8 +395,20 @@
 
   /* ---------- Rutas e imágenes ---------- */
 
-  function rutaCon(plantilla, n) {
-    return plantilla.replace('{n}', String(n));
+  function posicionDePieza(id) {
+    return (DATA.posiciones && DATA.posiciones[id]) || String(id);
+  }
+
+  function slotDePieza(id) {
+    const posicion = posicionDePieza(id);
+    const indice = DATA.ordenTablero ? DATA.ordenTablero.indexOf(posicion) : -1;
+    return indice >= 0 ? indice : id - 1;
+  }
+
+  function rutaPieza(tipo, id) {
+    return String(DATA.rutas[tipo])
+      .replace('{posicion}', posicionDePieza(id))
+      .replace('{n}', String(id));
   }
 
   function usarReal() {
@@ -405,8 +419,8 @@
     if (DATA.usarImagenesReales !== true) return Promise.resolve();
     const rutas = [];
     for (let n = 1; n <= ETAPAS; n += 1) {
-      rutas.push(rutaCon(DATA.rutas.frente, n));
-      rutas.push(rutaCon(DATA.rutas.espalda, n));
+      rutas.push(rutaPieza('frente', n));
+      rutas.push(rutaPieza('espalda', n));
     }
     if (DATA.rutas.completo) rutas.push(DATA.rutas.completo);
     return Promise.all(
@@ -720,7 +734,7 @@
     if (usarReal()) {
       return (
         '<span class="pieza pieza--real" aria-hidden="true">' +
-        '<img class="pieza__img" src="' + rutaCon(DATA.rutas.frente, id) + '" alt="" loading="lazy" decoding="async">' +
+        '<img class="pieza__img" src="' + rutaPieza('frente', id) + '" alt="" loading="lazy" decoding="async">' +
         '</span>'
       );
     }
@@ -1123,7 +1137,7 @@
       el.pergaminoReverso.classList.toggle('pergamino--real', real);
       if (el.pergaminoImagen) {
         if (real) {
-          el.pergaminoImagen.src = rutaCon(DATA.rutas.espalda, id);
+          el.pergaminoImagen.src = rutaPieza('espalda', id);
           el.pergaminoImagen.hidden = false;
         } else {
           el.pergaminoImagen.removeAttribute('src');
@@ -1238,7 +1252,7 @@
     if (ocupante) delete estado.colocadas[slot];
     estado.colocadas[slot] = pieza;
 
-    const acierto = pieza === slot + 1;
+    const acierto = slotDePieza(pieza) === slot;
     if (acierto) {
       estado.bloqueadas.push(slot);
       reproducir('acierto');
